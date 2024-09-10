@@ -358,7 +358,7 @@ const ControlAndDisplay: React.FC = () => {
                     <Card className="w-[800px] h-[400px]">
                         <CardHeader>
                             <CardTitle>Chart</CardTitle>
-                            <CardDescription>Date from... to...</CardDescription>
+                            <CardDescription>Date from 2024-08-01 to 2024-09-01</CardDescription>
                         </CardHeader>
                         <CardContent >
                                 <RadioGroup  
