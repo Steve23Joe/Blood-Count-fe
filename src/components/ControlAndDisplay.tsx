@@ -11,7 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
-import { addDays, format } from "date-fns"
+import { addDays, format, isWithinInterval } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { DateRange } from "react-day-picker"
 import { Calendar } from "@/components/ui/calendar"
@@ -103,25 +103,15 @@ const sexs = [
   } satisfies ChartConfig
   
 const initialDummyData = [
-    { time: 'Jan', WBC: 6000, HGB: 14,   RBC: 4.5, diagnosis: 'Diagnosis Method 1', sex: 'Male' },
-    { time: 'Feb', WBC: 6200, HGB: 13.9, RBC: 4.6, diagnosis: 'Diagnosis Method 2', sex: 'Female' },
-    { time: 'Mar', WBC: 6100, HGB: 14.1, RBC: 4.7, diagnosis: 'Diagnosis Method 3', sex: 'Male' },
-    { time: 'Apr', WBC: 6300, HGB: 14.2, RBC: 4.8, diagnosis: 'Diagnosis Method 1', sex: 'Female' },
-    { time: 'May', WBC: 6400, HGB: 14.3, RBC: 4.9, diagnosis: 'Diagnosis Method 4', sex: 'Male' },
-    { time: 'Jun', WBC: 6500, HGB: 14.5, RBC: 5.0, diagnosis: 'Diagnosis Method 2', sex: 'Female' },
+    { time: '2024-01', WBC: 6000, HGB: 14,   RBC: 4.5, diagnosis: 'Diagnosis Method 1', sex: 'Male' },
+    { time: '2024-02', WBC: 6200, HGB: 13.9, RBC: 4.6, diagnosis: 'Diagnosis Method 2', sex: 'Female' },
+    { time: '2024-04', WBC: 6100, HGB: 14.1, RBC: 4.7, diagnosis: 'Diagnosis Method 3', sex: 'Male' },
+    { time: '2024-05', WBC: 6300, HGB: 14.2, RBC: 4.8, diagnosis: 'Diagnosis Method 1', sex: 'Female' },
+    { time: '2024-07', WBC: 6400, HGB: 14.3, RBC: 4.9, diagnosis: 'Diagnosis Method 4', sex: 'Male' },
+    { time: '2024-09', WBC: 6500, HGB: 14.5, RBC: 5.0, diagnosis: 'Diagnosis Method 2', sex: 'Female' },
 ];
 
 const ControlAndDisplay: React.FC = () => {
-
-
-    
-
-
-    const [date, setDate] = React.useState<DateRange | undefined>({
-
-        from: new Date(),
-        to: addDays(new Date(), 20),
-      })
 
       const [age, setAge] = useState("");
       const handleAgeChange = (e: { target: { value: any; }; }) => {
@@ -148,7 +138,17 @@ const ControlAndDisplay: React.FC = () => {
     const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
     const [selectedMetric, setSelectedMetric] = useState('WBC');
     //const [sex] = useState('');
-    const [filteredData, setFilteredData] = useState(initialDummyData);
+    // const [filteredData, setFilteredData] = useState(initialDummyData);
+    
+    const [date, setDate] = useState(null);
+    const filteredData = useMemo(() => {
+      if (date?.from && date?.to) {
+        return initialDummyData.filter((d) =>
+          isWithinInterval(new Date(d.time), { start: date.from, end: date.to })
+        );
+      }
+      return initialDummyData; // If no date is selected, show all data
+    }, [date, initialDummyData]);
 
     // const handleFilterApply = () => {
     //     const newFilter = `Sex: ${sex}`;
@@ -161,11 +161,6 @@ const ControlAndDisplay: React.FC = () => {
     //     setFilteredData(newFilteredData);
     // };
 
-    const handleChipDelete = (chipToDelete: string) => {
-        setSelectedFilters((chips) => chips.filter((chip) => chip !== chipToDelete));
-        // Reset to initial data when a filter is removed
-        setFilteredData(initialDummyData);
-    };
 
     const handleMetricChange = (newValue: string) => {  
         setSelectedMetric(newValue);  
@@ -178,6 +173,7 @@ const ControlAndDisplay: React.FC = () => {
     //     setSex(event.target.value as string);
     // };
    
+    
 
     return (
         <Box sx={{ padding: 2}}>
@@ -373,47 +369,45 @@ const ControlAndDisplay: React.FC = () => {
 
                     {/**Calendar */}
 
-                    <div className={cn("grid gap-2")}>
+                    
+                        {/** Calendar Component */}
+                        <div className="grid gap-2">
                             <Popover>
-                                <PopoverTrigger asChild>
+                            <PopoverTrigger asChild>
                                 <Button
-                                    id="date"
-                                    variant={"outline"}
-                                    className={cn(
+                                id="date"
+                                variant={"outline"}
+                                className={cn(
                                     "w-[300px] justify-start text-left font-normal",
                                     !date && "text-muted-foreground"
-                                    )}
+                                )}
                                 >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {date?.from ? (
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {date?.from ? (
                                     date.to ? (
-                                        <>
-
-                                        {format(date.from, "LLL , y")} -{" "}
-                                        {format(date.to, "LLL , y")}
-                                        </>
+                                    <>
+                                        {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+                                    </>
                                     ) : (
-                                        format(date.from, "LLL , y")
-
-                                        
+                                    format(date.from, "LLL dd, y")
                                     )
-                                    ) : (
+                                ) : (
                                     <span>Pick a date</span>
-                                    )}
+                                )}
                                 </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
                                 <Calendar
-                                    initialFocus
-                                    mode="range"
-                                    defaultMonth={date?.from}
-                                    selected={date}
-                                    onSelect={setDate}
-                                    numberOfMonths={2}
+                                initialFocus
+                                mode="range"
+                                defaultMonth={date?.from}
+                                selected={date}
+                                onSelect={setDate}
+                                numberOfMonths={2}
                                 />
-                                </PopoverContent>
+                            </PopoverContent>
                             </Popover>
-                    </div>
+                        </div>
 
 
                 </CardContent>
@@ -446,7 +440,7 @@ const ControlAndDisplay: React.FC = () => {
                     <Card className="w-[850px] h-[400px]">
                         <CardHeader>
                             <CardTitle>Chart</CardTitle>
-                            <CardDescription>Date from 2024-08-01 to 2024-09-01</CardDescription>
+                            <CardDescription>This is chart</CardDescription>
                         </CardHeader>
                         <CardContent >
                                 <RadioGroup  
@@ -470,13 +464,14 @@ const ControlAndDisplay: React.FC = () => {
                                 </div>
                                 </RadioGroup>
                             <ChartContainer config={chartConfig} className="h-[200px] w-full">
-                                <LineChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                                {/** Chart Component */}
+                                    <LineChart data={filteredData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="time" />
                                     <YAxis />
                                     <Tooltip />
                                     <Line type="monotone" dataKey={selectedMetric} stroke="#8884d8" />
-                                </LineChart>
+                                    </LineChart>
                             </ChartContainer>
                         </CardContent>
                     </Card>
