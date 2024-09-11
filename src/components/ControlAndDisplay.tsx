@@ -190,30 +190,36 @@ const ControlAndDisplay: React.FC = () => {
                 </CardHeader>
                 <CardContent className="flex space-x-2">
                 {sexvalue && (
-                    <Badge variant="outline" className="flex items-center w-[100px]">
+                    <Badge variant="outline" className="flex items-center w-[80px]">
                     {sexs.find((sex) => sex.value === sexvalue)?.label}
-                    {/* <Close
-                        className="ml-2 h-4 w-4 cursor-pointer"
-                        onClick={() => setValue("")} 
-                    /> */}
+                    <button
+                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    onClick={() => setsexValue("")}
+                    >
+                    X
+                    </button>
                     </Badge>
                 )}
                 {BMIvalue && (
                     <Badge variant="outline" className="flex items-center w-[150px]">
                     {BMIs.find((bmi) => bmi.value === BMIvalue)?.label}
-                    {/* <Close
-                        className="ml-2 h-4 w-4 cursor-pointer"
-                        onClick={() => setValue("")} 
-                    /> */}
+                    <button
+                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    onClick={() => setBMIValue("")}
+                    >
+                    X
+                    </button>
                     </Badge>
                 )}
                 {Ethnicityvalue && (
-                    <Badge variant="outline" className="flex items-center w-[150px]">
+                    <Badge variant="outline" className="flex items-center w-[200px]">
                     {Ethnicitys.find((Ethnicity) => Ethnicity.value === Ethnicityvalue)?.label}
-                    {/* <Close
-                        className="ml-2 h-4 w-4 cursor-pointer"
-                        onClick={() => setValue("")} 
-                    /> */}
+                    <button
+                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    onClick={() => setEthnicityValue("")}
+                    >
+                    X
+                    </button>
                     </Badge>
                 )}
                 </CardContent>
@@ -328,7 +334,7 @@ const ControlAndDisplay: React.FC = () => {
                             variant="outline"
                             role="combobox"
                             aria-expanded={Ethnicityopen}
-                            className="w-[200px] justify-between"
+                            className="w-[220px] justify-between"
                             >
                             {Ethnicityvalue
                                 ? Ethnicitys.find((Ethnicity) => Ethnicity.value === Ethnicityvalue)?.label
@@ -336,7 +342,7 @@ const ControlAndDisplay: React.FC = () => {
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-[200px] p-0">
+                        <PopoverContent className="w-[220px] p-0">
                             <Command>
                             <CommandList>
                                 <CommandEmpty>No sex found.</CommandEmpty>
@@ -444,7 +450,7 @@ const ControlAndDisplay: React.FC = () => {
                         </CardHeader>
                         <CardContent >
                                 <RadioGroup  
-                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}
+                                className="flex space-x-2"
                                 aria-label="metric"
                                 name="metric"
                                 value={selectedMetric}
