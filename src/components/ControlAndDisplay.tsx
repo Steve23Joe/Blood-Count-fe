@@ -31,38 +31,65 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { Close } from '@radix-ui/react-dialog';
 
 
+const BMIs = [
+    {
+      value: "Underweight(<18)",
+      label: "Underweight(<18)",
+    },
+    {
+      value: "Normal(18-24.9)",
+      label: "Normal(18-24.9)",
+    },
+    {
+      value: "Overweight(25-29.9)",
+      label: "Overweight(25-29.9)",
+    },
+    {
+      value: "Obesity(>30)",
+      label: "Obesity(>30)",
+    },
+   
+  ]
 
+  const Ethnicitys = [
+    
+    {
+        value: "White British",
+        label: "White British",
+    },
+    {
+        value: "Other White Background",
+        label: "Other White Background",
+    },
+    {
+        value: "Black Caribbean",
+        label: "Black Caribbean",
+    },
+    {
+        value: "Other Asian Background",
+        label: "Other Asian Background",
+    },
+  ]
 
-const frameworks = [
+const sexs = [
     {
-      value: "next.js",
-      label: "Next.js",
+      value: "male",
+      label: "Male",
     },
     {
-      value: "sveltekit",
-      label: "SvelteKit",
+      value: "female",
+      label: "Female",
     },
     {
-      value: "nuxt.js",
-      label: "Nuxt.js",
+      value: "other",
+      label: "Other",
     },
-    {
-      value: "remix",
-      label: "Remix",
-    },
-    {
-      value: "astro",
-      label: "Astro",
-    },
+    
   ] 
-  const chartConfig11 = {
-    desktop: {
-      label: "Desktop",
-      color: "hsl(var(--chart-1))",
-    },
-  } satisfies ChartConfig
+ 
 
   const chartConfig = {
     desktop: {
@@ -86,31 +113,53 @@ const initialDummyData = [
 
 const ControlAndDisplay: React.FC = () => {
 
+
+    
+
+
     const [date, setDate] = React.useState<DateRange | undefined>({
 
         from: new Date(),
         to: addDays(new Date(), 20),
       })
+
+      const [age, setAge] = useState("");
+      const handleAgeChange = (e: { target: { value: any; }; }) => {
+        let agevalue = e.target.value;
+        if (agevalue < 0) {
+          agevalue = 0;
+        } else if (agevalue > 120) {
+          agevalue = 120;
+        }
     
+        setAge(agevalue);
+    };
 
         
-    const [open, setOpen] = React.useState(false)
-    const [value, setValue] = React.useState("")
+    const [sexopen, setsexOpen] = React.useState(false)
+    const [sexvalue, setsexValue] = React.useState("")
+
+    const [BMIopen, setBMIOpen] = React.useState(false)
+    const [BMIvalue, setBMIValue] = React.useState("")
+
+    const [Ethnicityopen, setEthnicityOpen] = React.useState(false)
+    const [Ethnicityvalue, setEthnicityValue] = React.useState("")
+
     const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
     const [selectedMetric, setSelectedMetric] = useState('WBC');
-    const [sex] = useState('');
+    //const [sex] = useState('');
     const [filteredData, setFilteredData] = useState(initialDummyData);
 
-    const handleFilterApply = () => {
-        const newFilter = `Sex: ${sex}`;
-        if (!selectedFilters.includes(newFilter) && sex) {
-            setSelectedFilters((prev) => [...prev, newFilter]);
-        }
+    // const handleFilterApply = () => {
+    //     const newFilter = `Sex: ${sex}`;
+    //     if (!selectedFilters.includes(newFilter) && sex) {
+    //         setSelectedFilters((prev) => [...prev, newFilter]);
+    //     }
 
-        // Apply filtering based on the selected sex
-        const newFilteredData = initialDummyData.filter((item) => !sex || item.sex === sex);
-        setFilteredData(newFilteredData);
-    };
+    //     // Apply filtering based on the selected sex
+    //     const newFilteredData = initialDummyData.filter((item) => !sex || item.sex === sex);
+    //     setFilteredData(newFilteredData);
+    // };
 
     const handleChipDelete = (chipToDelete: string) => {
         setSelectedFilters((chips) => chips.filter((chip) => chip !== chipToDelete));
@@ -139,52 +188,87 @@ const ControlAndDisplay: React.FC = () => {
                     <CardTitle>Control Panel</CardTitle>
                     <CardDescription>Card Description</CardDescription>
                 </CardHeader>
-                <CardContent style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
+                <CardContent className="flex space-x-2">
+                {sexvalue && (
+                    <Badge variant="outline" className="flex items-center w-[100px]">
+                    {sexs.find((sex) => sex.value === sexvalue)?.label}
+                    {/* <Close
+                        className="ml-2 h-4 w-4 cursor-pointer"
+                        onClick={() => setValue("")} 
+                    /> */}
+                    </Badge>
+                )}
+                {BMIvalue && (
+                    <Badge variant="outline" className="flex items-center w-[150px]">
+                    {BMIs.find((bmi) => bmi.value === BMIvalue)?.label}
+                    {/* <Close
+                        className="ml-2 h-4 w-4 cursor-pointer"
+                        onClick={() => setValue("")} 
+                    /> */}
+                    </Badge>
+                )}
+                {Ethnicityvalue && (
+                    <Badge variant="outline" className="flex items-center w-[150px]">
+                    {Ethnicitys.find((Ethnicity) => Ethnicity.value === Ethnicityvalue)?.label}
+                    {/* <Close
+                        className="ml-2 h-4 w-4 cursor-pointer"
+                        onClick={() => setValue("")} 
+                    /> */}
+                    </Badge>
+                )}
+                </CardContent>
 
-                <Badge />
+
+
+                <CardContent className="flex space-x-4">
 
                     {/**Age */}
                     <input  
                         className='w-[100px]'  
                         type="number"  
-                        placeholder="Age"  
+                        placeholder="Age" 
+                        min={0}
+                        max={120} 
+                        value={age}
+                        onChange={handleAgeChange} 
                         />  
+
                     {/**Select Sex */}
-                    <Popover open={open} onOpenChange={setOpen}>
+                    <Popover open={sexopen} onOpenChange={setsexOpen}>
                         <PopoverTrigger asChild>
                             <Button
                             variant="outline"
                             role="combobox"
-                            aria-expanded={open}
+                            aria-expanded={sexopen}
                             className="w-[200px] justify-between"
                             >
-                            {value
-                                ? frameworks.find((framework) => framework.value === value)?.label
-                                : "Select framework..."}
+                            {sexvalue
+                                ? sexs.find((sex) => sex.value === sexvalue)?.label
+                                : "Select sex"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-[200px] p-0">
                             <Command>
                             <CommandList>
-                                <CommandEmpty>No framework found.</CommandEmpty>
+                                <CommandEmpty>No sex found.</CommandEmpty>
                                 <CommandGroup>
-                                {frameworks.map((framework) => (
+                                {sexs.map((sex) => (
                                     <CommandItem
-                                    key={framework.value}
-                                    value={framework.value}
+                                    key={sex.value}
+                                    value={sex.value}
                                     onSelect={(currentValue) => {
-                                        setValue(currentValue === value ? "" : currentValue)
-                                        setOpen(false)
+                                        setsexValue(currentValue === sexvalue ? "" : currentValue)
+                                        setsexOpen(false)
                                     }}
                                     >
                                     <Check
                                         className={cn(
                                         "mr-2 h-4 w-4",
-                                        value === framework.value ? "opacity-100" : "opacity-0"
+                                        sexvalue === sex.value ? "opacity-100" : "opacity-0"
                                         )}
                                     />
-                                    {framework.label}
+                                    {sex.label}
                                     </CommandItem>
                                 ))}
                                 </CommandGroup>
@@ -193,42 +277,42 @@ const ControlAndDisplay: React.FC = () => {
                         </PopoverContent>
                     </Popover>
 
-                    {/* <Popover open={open} onOpenChange={setOpen}>
+                    {/**Select BMI */}
+                    <Popover open={BMIopen} onOpenChange={setBMIOpen}>
                         <PopoverTrigger asChild>
                             <Button
                             variant="outline"
                             role="combobox"
-                            aria-expanded={open}
+                            aria-expanded={BMIopen}
                             className="w-[200px] justify-between"
                             >
-                            {value
-                                ? frameworks.find((framework) => framework.value === value)?.label
-                                : "Select framework..."}
+                            {BMIvalue
+                                ? BMIs.find((bmi) => bmi.value === BMIvalue)?.label
+                                : "Select BMI"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-[200px] p-0">
                             <Command>
-                            <CommandInput placeholder="Search framework..." />
                             <CommandList>
-                                <CommandEmpty>No framework found.</CommandEmpty>
+                                <CommandEmpty>No sex found.</CommandEmpty>
                                 <CommandGroup>
-                                {frameworks.map((framework) => (
+                                {BMIs.map((bmi) => (
                                     <CommandItem
-                                    key={framework.value}
-                                    value={framework.value}
+                                    key={bmi.value}
+                                    value={bmi.value}
                                     onSelect={(currentValue) => {
-                                        setValue(currentValue === value ? "" : currentValue)
-                                        setOpen(false)
+                                        setBMIValue(currentValue === BMIvalue ? "" : currentValue)
+                                        setBMIOpen(false)
                                     }}
                                     >
                                     <Check
                                         className={cn(
                                         "mr-2 h-4 w-4",
-                                        value === framework.value ? "opacity-100" : "opacity-0"
+                                        BMIvalue === bmi.value ? "opacity-100" : "opacity-0"
                                         )}
                                     />
-                                    {framework.label}
+                                    {bmi.label}
                                     </CommandItem>
                                 ))}
                                 </CommandGroup>
@@ -236,52 +320,50 @@ const ControlAndDisplay: React.FC = () => {
                             </Command>
                         </PopoverContent>
                     </Popover>
-                    <Popover open={open} onOpenChange={setOpen}>
+                    
+                    {/**Select Ethnicitys */}
+                    <Popover open={Ethnicityopen} onOpenChange={setEthnicityOpen}>
                         <PopoverTrigger asChild>
                             <Button
                             variant="outline"
                             role="combobox"
-                            aria-expanded={open}
+                            aria-expanded={Ethnicityopen}
                             className="w-[200px] justify-between"
                             >
-                            {value
-                                ? frameworks.find((framework) => framework.value === value)?.label
-                                : "Select framework..."}
+                            {Ethnicityvalue
+                                ? Ethnicitys.find((Ethnicity) => Ethnicity.value === Ethnicityvalue)?.label
+                                : "Select Ethnicity"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-[200px] p-0">
                             <Command>
-                            <CommandInput placeholder="Search framework..." />
                             <CommandList>
-                                <CommandEmpty>No framework found.</CommandEmpty>
+                                <CommandEmpty>No sex found.</CommandEmpty>
                                 <CommandGroup>
-                                {frameworks.map((framework) => (
+                                {Ethnicitys.map((Ethnicity) => (
                                     <CommandItem
-                                    key={framework.value}
-                                    value={framework.value}
+                                    key={Ethnicity.value}
+                                    value={Ethnicity.value}
                                     onSelect={(currentValue) => {
-                                        setValue(currentValue === value ? "" : currentValue)
-                                        setOpen(false)
+                                        setEthnicityValue(currentValue === Ethnicityvalue ? "" : currentValue)
+                                        setEthnicityOpen(false)
                                     }}
                                     >
                                     <Check
                                         className={cn(
                                         "mr-2 h-4 w-4",
-                                        value === framework.value ? "opacity-100" : "opacity-0"
+                                        Ethnicityvalue === Ethnicity.value ? "opacity-100" : "opacity-0"
                                         )}
                                     />
-                                    {framework.label}
+                                    {Ethnicity.label}
                                     </CommandItem>
                                 ))}
                                 </CommandGroup>
                             </CommandList>
                             </Command>
                         </PopoverContent>
-                    </Popover> */}
-
-
-                    {/* *Calendar */}
+                    </Popover>
 
                     {/**Calendar */}
 
@@ -337,7 +419,7 @@ const ControlAndDisplay: React.FC = () => {
                     <CardTitle >Trends</CardTitle>
                     <CardDescription>Card Description</CardDescription>
                 </CardHeader>
-                <CardContent style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
+                <CardContent className="flex space-x-10">
                     {/* Left Side: Top 5 Diagnosis Methods */}
                     <Card className="w-[400px] h-[400px]">
                         <CardHeader>
@@ -355,7 +437,7 @@ const ControlAndDisplay: React.FC = () => {
                         </CardContent>
                     </Card>
                     {/*  Chart */}
-                    <Card className="w-[800px] h-[400px]">
+                    <Card className="w-[850px] h-[400px]">
                         <CardHeader>
                             <CardTitle>Chart</CardTitle>
                             <CardDescription>Date from 2024-08-01 to 2024-09-01</CardDescription>
