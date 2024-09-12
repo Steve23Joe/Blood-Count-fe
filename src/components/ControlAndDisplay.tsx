@@ -18,6 +18,16 @@ import { DateRange } from "react-day-picker"
 import { Calendar } from "@/components/ui/calendar"
 import { Badge } from "@/components/ui/badge"
 import { TrendingUp } from "lucide-react"
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+  } from "@/components/ui/table"
+  
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -34,6 +44,29 @@ import {
 } from "@/components/ui/popover"
 import { Close } from '@radix-ui/react-dialog';
 
+
+const diagnosis = [
+    {
+        "diagnosis": "Normal",
+        "count": "1250",
+    },
+    {
+        "diagnosis":"Mild Anemia",
+        "count":"450"
+    },
+    {
+        "diagnosis":"Moderate Anemia",
+        "count":"200"
+    },
+    {
+        "diagnosis":"Severe Anemia",
+        "count":"80"
+    },
+    {
+        "diagnosis":"Polycythemia",
+        "count":"100"
+    }
+  ]
 
 const BMIs = [
     {
@@ -103,7 +136,22 @@ const sexs = [
     },
   } satisfies ChartConfig
 
-  
+  const getBadgeColor = (diagnosis: string) => {
+    switch(diagnosis) {
+      case 'Normal':
+        return '#228B22'; 
+      case 'Mild Anemia':
+        return '#EEEE00'; 
+      case 'Moderate Anemia':
+        return '#EE7942'; 
+      case 'Severe Anemia':
+        return '#FF0000'; 
+      case 'Polycythemia':
+        return '#8A2BE2'; 
+      default:
+        return '#ccc';
+    }
+  };
 
   
 const initialDummyData = [{ 
@@ -115,11 +163,12 @@ const initialDummyData = [{
     "NormalRBC": 4.05, 
     "MildAnemiaRBC": 5.85, 
     "ModerateAnemiaRBC": 8.55,
+    "SevereAnemiaRBC":9.55,
+    "PolycythemiaRBC":11.55,
     "UL95CI_MaleWBC": [5.67, 5.13],
     "UL95CI_FemaleWBC": [5.2, 4.7],
     "UL95CI_MaleHGB": [13.23, 11.97],
-    "UL95CI_FemaleHGB": [9.45, 8.55],
-    diagnosis:"normal1"
+    "UL95CI_FemaleHGB": [9.45, 8.55]
 },
 { 
     "time": "2024-02", 
@@ -130,11 +179,12 @@ const initialDummyData = [{
     "NormalRBC": 3.645, 
     "MildAnemiaRBC": 5.265, 
     "ModerateAnemiaRBC": 7.695,
+    "SevereAnemiaRBC":8.55,
+    "PolycythemiaRBC":10.55,
     "UL95CI_MaleWBC": [5.1, 4.62],
     "UL95CI_FemaleWBC": [4.68, 4.23],
     "UL95CI_MaleHGB": [11.91, 10.78],
-    "UL95CI_FemaleHGB": [8.51, 7.7],
-    diagnosis:"normal2"
+    "UL95CI_FemaleHGB": [8.51, 7.7]
 
 },
 { 
@@ -146,11 +196,13 @@ const initialDummyData = [{
     "NormalRBC": 4.1925, 
     "MildAnemiaRBC": 6.1275, 
     "ModerateAnemiaRBC": 8.9325,
+    "SevereAnemiaRBC":7.55,
+    "PolycythemiaRBC":9.55,
     "UL95CI_MaleWBC": [5.87, 5.31],
     "UL95CI_FemaleWBC": [5.39, 4.87],
     "UL95CI_MaleHGB": [13.69, 12.39],
-    "UL95CI_FemaleHGB": [9.78, 8.85],
-    diagnosis:"normal3"
+    "UL95CI_FemaleHGB": [9.78, 8.85]
+
 },
 { 
     "time": "2024-04", 
@@ -161,6 +213,8 @@ const initialDummyData = [{
     "NormalRBC": 3.773, 
     "MildAnemiaRBC": 5.542, 
     "ModerateAnemiaRBC": 8.06,
+    "SevereAnemiaRBC":6.55,
+    "PolycythemiaRBC":8.55,
     "UL95CI_MaleWBC": [5.28, 4.78],
     "UL95CI_FemaleWBC": [4.85, 4.39],
     "UL95CI_MaleHGB": [12.33, 11.15],
@@ -168,15 +222,17 @@ const initialDummyData = [{
 },
 { 
     "time": "2024-05", 
-    "MaleWBC": 5.7845,  
-    "FemaleWBC": 5.308,
+    "MaleWBC": 5.308,
+    "FemaleWBC": 5.7845,  
     "MaleHGB": 13.5, 
     "FemaleHGB": 9.64, 
     "NormalRBC": 4.338, 
     "MildAnemiaRBC": 6.373, 
     "ModerateAnemiaRBC": 9.28,
-    "UL95CI_MaleWBC": [6.07, 5.5],
-    "UL95CI_FemaleWBC": [5.57, 5.04],
+    "SevereAnemiaRBC":5.55,
+    "PolycythemiaRBC":7.55,
+    "UL95CI_MaleWBC": [5.57, 5.04],
+    "UL95CI_FemaleWBC": [6.07, 5.5],
     "UL95CI_MaleHGB": [14.18, 12.83],
     "UL95CI_FemaleHGB": [10.12, 9.16]
 },
@@ -189,6 +245,8 @@ const initialDummyData = [{
     "NormalRBC": 3.904, 
     "MildAnemiaRBC": 5.736, 
     "ModerateAnemiaRBC": 8.36,
+    "SevereAnemiaRBC":4.55,
+    "PolycythemiaRBC":6.55,
     "UL95CI_MaleWBC": [5.47, 4.94],
     "UL95CI_FemaleWBC": [5.02, 4.54],
     "UL95CI_MaleHGB": [12.76, 11.55],
@@ -203,6 +261,8 @@ const initialDummyData = [{
     "NormalRBC": 4.49, 
     "MildAnemiaRBC": 6.6, 
     "ModerateAnemiaRBC": 9.6,
+    "SevereAnemiaRBC":9.55,
+    "PolycythemiaRBC":11.55,
     "UL95CI_MaleWBC": [6.29, 5.69],
     "UL95CI_FemaleWBC": [5.77, 5.22],
     "UL95CI_MaleHGB": [14.66, 13.27],
@@ -210,15 +270,17 @@ const initialDummyData = [{
 },
 { 
     "time": "2024-08", 
-    "MaleWBC": 5.387,  
-    "FemaleWBC": 4.944,
+    "MaleWBC":  4.944,
+    "FemaleWBC": 5.387,
     "MaleHGB": 12.58, 
     "FemaleHGB": 8.979, 
     "NormalRBC": 4.041, 
     "MildAnemiaRBC": 5.94, 
     "ModerateAnemiaRBC": 8.64,
-    "UL95CI_MaleWBC": [5.66, 5.11],
-    "UL95CI_FemaleWBC": [5.19, 4.7],
+    "SevereAnemiaRBC":10.55,
+    "PolycythemiaRBC":12.55,
+    "UL95CI_MaleWBC": [5.19, 4.7],
+    "UL95CI_FemaleWBC": [5.66, 5.11],
     "UL95CI_MaleHGB": [13.21, 11.95],
     "UL95CI_FemaleHGB": [9.43, 8.53]
 },
@@ -231,6 +293,8 @@ const initialDummyData = [{
     "NormalRBC": 4.647, 
     "MildAnemiaRBC": 6.837, 
     "ModerateAnemiaRBC": 9.945,
+    "SevereAnemiaRBC":11.55,
+    "PolycythemiaRBC":13.55,
     "UL95CI_MaleWBC": [6.51, 5.88],
     "UL95CI_FemaleWBC": [5.97, 5.4],
     "UL95CI_MaleHGB": [15.19, 13.74],
@@ -245,6 +309,8 @@ const initialDummyData = [{
     "NormalRBC": 4.182, 
     "MildAnemiaRBC": 6.156, 
     "ModerateAnemiaRBC": 8.964,
+    "SevereAnemiaRBC":9.55,
+    "PolycythemiaRBC":11.55,
     "UL95CI_MaleWBC": [5.85, 5.29],
     "UL95CI_FemaleWBC": [5.37, 4.86],
     "UL95CI_MaleHGB": [13.67, 12.37],
@@ -284,6 +350,7 @@ const ControlAndDisplay: React.FC = () => {
     // const [filteredData, setFilteredData] = useState(initialDummyData);
     
     const [date, setDate] = useState(null);
+
     const filteredData = useMemo(() => {
       if (date?.from && date?.to) {
         return initialDummyData.filter((d) =>
@@ -327,44 +394,6 @@ const ControlAndDisplay: React.FC = () => {
                     <CardTitle>Control Panel</CardTitle>
                     <CardDescription>Card Description</CardDescription>
                 </CardHeader>
-                <CardContent className="flex space-x-2">
-                {sexvalue && (
-                    <Badge variant="outline" className="flex items-center w-[auto]">
-                    Sex:{sexs.find((sex) => sex.value === sexvalue)?.label}
-                    <button
-                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                    onClick={() => setsexValue("")}
-                    >
-                    X
-                    </button>
-                    </Badge>
-                )}
-                {BMIvalue && (
-                    <Badge variant="outline" className="flex items-center w-[auto]">
-                    BMI:{BMIs.find((bmi) => bmi.value === BMIvalue)?.label}
-                    <button
-                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                    onClick={() => setBMIValue("")}
-                    >
-                    X
-                    </button>
-                    </Badge>
-                )}
-                {Ethnicityvalue && (
-                    <Badge variant="outline" className="flex items-center w-[auto]">
-                    Ethnicity:{Ethnicitys.find((Ethnicity) => Ethnicity.value === Ethnicityvalue)?.label}
-                    <button
-                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                    onClick={() => setEthnicityValue("")}
-                    >
-                    X
-                    </button>
-                    </Badge>
-                )}
-                </CardContent>
-
-
-
                 <CardContent className="flex space-x-4">
 
                     {/**Age */}
@@ -561,27 +590,79 @@ const ControlAndDisplay: React.FC = () => {
             <Card>
                 <CardHeader>
                     <CardTitle >Trends</CardTitle>
-                    <CardDescription>Card Description</CardDescription>
+                    <CardDescription className="flex space-x-2">
+                {sexvalue && (
+                    <Badge variant="outline" className="flex items-center w-[auto]">
+                    Sex:{sexs.find((sex) => sex.value === sexvalue)?.label}
+                    <button
+                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    onClick={() => setsexValue("")}
+                    >
+                    X
+                    </button>
+                    </Badge>
+                )}
+                {BMIvalue && (
+                    <Badge variant="outline" className="flex items-center w-[auto]">
+                    BMI:{BMIs.find((bmi) => bmi.value === BMIvalue)?.label}
+                    <button
+                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    onClick={() => setBMIValue("")}
+                    >
+                    X
+                    </button>
+                    </Badge>
+                )}
+                {Ethnicityvalue && (
+                    <Badge variant="outline" className="flex items-center w-[auto]">
+                    Ethnicity:{Ethnicitys.find((Ethnicity) => Ethnicity.value === Ethnicityvalue)?.label}
+                    <button
+                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    onClick={() => setEthnicityValue("")}
+                    >
+                    X
+                    </button>
+                    </Badge>
+                )}
+                </CardDescription>
                 </CardHeader>
                 <CardContent className="flex space-x-10">
                     {/* Left Side: Top 5 Diagnosis Methods */}
-                    <Card className="w-[400px] h-[600px]">
+                    <Card className="w-[400px] h-[auto]">
                         <CardHeader>
                             <CardTitle>Top 5 Diagnosis Methods</CardTitle>
                             <CardDescription>Card Description</CardDescription>
                         </CardHeader>
                         <CardContent>
-                        <div className="space-y-1">
-                        {filteredData.slice(0, 5).map((item, index) => (
-                                <p key={index}>
-                                 {item.diagnosis} 
-                                </p>
-                            ))}
-                        </div>
-                        </CardContent>
+                                <Table className="w-full">
+                                    <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="font-semibold text-left pl-4">Diagnosis</TableHead>
+                                        <TableHead className="font-semibold text-right pr-4">Count</TableHead>
+                                    </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                    {diagnosis.map((diagnosi) => (
+                                        <TableRow key={diagnosi.diagnosis} className="hover:bg-gray-50">
+                                        <TableCell className="flex items-center space-x-2 pl-4 py-4"> 
+                                            <Badge  
+                                            style={{       
+                                                backgroundColor: getBadgeColor(diagnosi.diagnosis), 
+                                            }}
+                                            />
+                                            <span className="font-medium">{diagnosi.diagnosis}</span>
+                                        </TableCell>
+                                        <TableCell className="text-right pr-4 py-4 font-medium"> 
+                                            {diagnosi.count}
+                                        </TableCell>
+                                        </TableRow>
+                                    ))}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
                     </Card>
                     {/*  Chart */}
-                    <Card className="w-[850px] h-[600px]">
+                    <Card className="w-[850px] h-[auto]">
                         <CardHeader>
                             <CardTitle>Chart</CardTitle>
                             <CardDescription>This is chart</CardDescription>
@@ -622,30 +703,32 @@ const ControlAndDisplay: React.FC = () => {
                                     >
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="time" />
-                                <YAxis />
+                                <YAxis label={{ value: selectedMetric, angle: -90, position: 'insideLeft', textAnchor: 'middle' }} domain={['auto', 'auto']}/>
                                 <Tooltip  />
                                 <Legend  />
                                     {selectedMetric === "WBC" && (
                                         <>
-                                        <Area type="monotone" dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#8884d8"/>
-                                        <Line type="monotone" dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
-                                        <Area type="monotone" dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#8884d8"/>
-                                        <Line type="monotone" dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
+                                        <Area  dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
+                                        <Line  dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
+                                        <Area  dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#8884d8"/>
+                                        <Line  dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
                                       </>
                                     )}
                                      {selectedMetric === "HGB" && (
                                         <>
-                                        <Area type="monotone" dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#8884d8"/>
-                                        <Line type="monotone" dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
-                                        <Area type="monotone" dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#8884d8"/>
-                                        <Line type="monotone" dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
+                                        <Area  dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
+                                        <Line  dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
+                                        <Area  dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#8884d8"/>
+                                        <Line  dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
                                         </>
                                     )}
                                     {selectedMetric === "RBC" && (
                                         <>
-                                        <Line type="monotone" dataKey={`Normal${selectedMetric}`} stroke="#006400" />
-                                        <Line type="monotone" dataKey={`MildAnemia${selectedMetric}`} stroke="#EEC900" />
-                                        <Line type="monotone" dataKey={`ModerateAnemia${selectedMetric}`} stroke="#B22222" />
+                                        <Line  dataKey={`Normal${selectedMetric}`} stroke="#228B22" />
+                                        <Line  dataKey={`MildAnemia${selectedMetric}`} stroke="#EEEE00" />
+                                        <Line  dataKey={`ModerateAnemia${selectedMetric}`} stroke="#EE7942" />
+                                        <Line  dataKey={`SevereAnemia${selectedMetric}`} stroke="#FF0000" />
+                                        <Line  dataKey={`Polycythemia${selectedMetric}`} stroke="#8A2BE2" />
                                         </>
                                     )}
                                     </ComposedChart>
