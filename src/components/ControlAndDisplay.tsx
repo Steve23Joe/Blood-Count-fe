@@ -539,9 +539,6 @@ const ControlAndDisplay: React.FC = () => {
                         </PopoverContent>
                     </Popover>
 
-                    {/**Calendar */}
-
-                    
                        {/** Calendar Component */}
                             <div className="grid gap-2">
                             <Popover>
