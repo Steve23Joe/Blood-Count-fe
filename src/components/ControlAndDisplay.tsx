@@ -334,15 +334,17 @@ const ControlAndDisplay: React.FC = () => {
         setAge(agevalue);
     };
 
-        
-    const [sexopen, setsexOpen] = React.useState(false)
-    const [sexvalue, setsexValue] = React.useState("")
-
-    const [BMIopen, setBMIOpen] = React.useState(false)
-    const [BMIvalue, setBMIValue] = React.useState("")
-
-    const [Ethnicityopen, setEthnicityOpen] = React.useState(false)
-    const [Ethnicityvalue, setEthnicityValue] = React.useState("")
+    const [state, setState] = React.useState({
+        sexopen: false,
+        sexvalue: "",
+        BMIopen: false,
+        BMIvalue: "",
+        Ethnicityopen: false,
+        Ethnicityvalue: ""
+    });
+    
+   
+ 
 
     const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
     const [selectedMetric, setSelectedMetric] = useState('WBC');
@@ -408,16 +410,16 @@ const ControlAndDisplay: React.FC = () => {
                         />  
 
                     {/**Select Sex */}
-                    <Popover open={sexopen} onOpenChange={setsexOpen}>
+                    <Popover open={state.sexopen}  onOpenChange={(open) => setState(prev => ({ ...prev, sexopen: open }))}>
                         <PopoverTrigger asChild>
                             <Button
                             variant="outline"
                             role="combobox"
-                            aria-expanded={sexopen}
+                            aria-expanded={state.sexopen}
                             className="w-[200px] justify-between"
                             >
-                            {sexvalue
-                                ? sexs.find((sex) => sex.value === sexvalue)?.label
+                            {state.sexvalue
+                                ? sexs.find((sex) => sex.value === state.sexvalue)?.label
                                 : "Select sex"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
@@ -432,14 +434,17 @@ const ControlAndDisplay: React.FC = () => {
                                     key={sex.value}
                                     value={sex.value}
                                     onSelect={(currentValue) => {
-                                        setsexValue(currentValue === sexvalue ? "" : currentValue)
-                                        setsexOpen(false)
+                                        setState(prev => ({
+                                            ...prev,
+                                            sexvalue: currentValue === state.sexvalue ? "" : currentValue,
+                                            sexopen: false
+                                          }));
                                     }}
                                     >
                                     <Check
                                         className={cn(
                                         "mr-2 h-4 w-4",
-                                        sexvalue === sex.value ? "opacity-100" : "opacity-0"
+                                        state.sexvalue === sex.value ? "opacity-100" : "opacity-0"
                                         )}
                                     />
                                     {sex.label}
@@ -451,17 +456,19 @@ const ControlAndDisplay: React.FC = () => {
                         </PopoverContent>
                     </Popover>
 
-                    {/**Select BMI */}
-                    <Popover open={BMIopen} onOpenChange={setBMIOpen}>
+                    {/** Select BMI */}
+                        <Popover 
+                        open={state.BMIopen} 
+                        onOpenChange={(open) => setState(prev => ({ ...prev, BMIopen: open }))}>
                         <PopoverTrigger asChild>
                             <Button
                             variant="outline"
                             role="combobox"
-                            aria-expanded={BMIopen}
+                            aria-expanded={state.BMIopen}
                             className="w-[200px] justify-between"
                             >
-                            {BMIvalue
-                                ? BMIs.find((bmi) => bmi.value === BMIvalue)?.label
+                            {state.BMIvalue
+                                ? BMIs.find((bmi) => bmi.value === state.BMIvalue)?.label
                                 : "Select BMI"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
@@ -469,21 +476,24 @@ const ControlAndDisplay: React.FC = () => {
                         <PopoverContent className="w-[200px] p-0">
                             <Command>
                             <CommandList>
-                                <CommandEmpty>No sex found.</CommandEmpty>
+                                <CommandEmpty>No BMI found.</CommandEmpty>
                                 <CommandGroup>
                                 {BMIs.map((bmi) => (
                                     <CommandItem
                                     key={bmi.value}
                                     value={bmi.value}
                                     onSelect={(currentValue) => {
-                                        setBMIValue(currentValue === BMIvalue ? "" : currentValue)
-                                        setBMIOpen(false)
+                                        setState(prev => ({
+                                        ...prev,
+                                        BMIvalue: currentValue === state.BMIvalue ? "" : currentValue,
+                                        BMIopen: false
+                                        }));
                                     }}
                                     >
                                     <Check
                                         className={cn(
                                         "mr-2 h-4 w-4",
-                                        BMIvalue === bmi.value ? "opacity-100" : "opacity-0"
+                                        state.BMIvalue === bmi.value ? "opacity-100" : "opacity-0"
                                         )}
                                     />
                                     {bmi.label}
@@ -493,19 +503,22 @@ const ControlAndDisplay: React.FC = () => {
                             </CommandList>
                             </Command>
                         </PopoverContent>
-                    </Popover>
-                    
-                    {/**Select Ethnicitys */}
-                    <Popover open={Ethnicityopen} onOpenChange={setEthnicityOpen}>
+                        </Popover>
+
+                                            
+                    {/** Select Ethnicity */}
+                        <Popover 
+                        open={state.Ethnicityopen} 
+                        onOpenChange={(open) => setState(prev => ({ ...prev, Ethnicityopen: open }))}>
                         <PopoverTrigger asChild>
                             <Button
                             variant="outline"
                             role="combobox"
-                            aria-expanded={Ethnicityopen}
+                            aria-expanded={state.Ethnicityopen}
                             className="w-[220px] justify-between"
                             >
-                            {Ethnicityvalue
-                                ? Ethnicitys.find((Ethnicity) => Ethnicity.value === Ethnicityvalue)?.label
+                            {state.Ethnicityvalue
+                                ? Ethnicitys.find((Ethnicity) => Ethnicity.value === state.Ethnicityvalue)?.label
                                 : "Select Ethnicity"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
@@ -513,21 +526,24 @@ const ControlAndDisplay: React.FC = () => {
                         <PopoverContent className="w-[220px] p-0">
                             <Command>
                             <CommandList>
-                                <CommandEmpty>No sex found.</CommandEmpty>
+                                <CommandEmpty>No Ethnicity found.</CommandEmpty>
                                 <CommandGroup>
                                 {Ethnicitys.map((Ethnicity) => (
                                     <CommandItem
                                     key={Ethnicity.value}
                                     value={Ethnicity.value}
                                     onSelect={(currentValue) => {
-                                        setEthnicityValue(currentValue === Ethnicityvalue ? "" : currentValue)
-                                        setEthnicityOpen(false)
+                                        setState(prev => ({
+                                        ...prev,
+                                        Ethnicityvalue: currentValue === state.Ethnicityvalue ? "" : currentValue,
+                                        Ethnicityopen: false
+                                        }));
                                     }}
                                     >
                                     <Check
                                         className={cn(
                                         "mr-2 h-4 w-4",
-                                        Ethnicityvalue === Ethnicity.value ? "opacity-100" : "opacity-0"
+                                        state.Ethnicityvalue === Ethnicity.value ? "opacity-100" : "opacity-0"
                                         )}
                                     />
                                     {Ethnicity.label}
@@ -537,7 +553,8 @@ const ControlAndDisplay: React.FC = () => {
                             </CommandList>
                             </Command>
                         </PopoverContent>
-                    </Popover>
+                        </Popover>
+
 
                        {/** Calendar Component */}
                             <div className="grid gap-2">
@@ -547,7 +564,7 @@ const ControlAndDisplay: React.FC = () => {
                                     id="date"
                                     variant={"outline"}
                                     className={cn(
-                                    "w-[300px] justify-start text-left font-normal",
+                                    "w-[auto] justify-start text-left font-normal",
                                     !date && "text-muted-foreground"
                                     )}
                                 >
@@ -588,40 +605,41 @@ const ControlAndDisplay: React.FC = () => {
                 <CardHeader>
                     <CardTitle >Trends</CardTitle>
                     <CardDescription className="flex space-x-2">
-                {sexvalue && (
-                    <Badge variant="outline" className="flex items-center w-[auto]">
-                    Sex:{sexs.find((sex) => sex.value === sexvalue)?.label}
-                    <button
-                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                    onClick={() => setsexValue("")}
-                    >
-                    X
-                    </button>
-                    </Badge>
-                )}
-                {BMIvalue && (
-                    <Badge variant="outline" className="flex items-center w-[auto]">
-                    BMI:{BMIs.find((bmi) => bmi.value === BMIvalue)?.label}
-                    <button
-                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                    onClick={() => setBMIValue("")}
-                    >
-                    X
-                    </button>
-                    </Badge>
-                )}
-                {Ethnicityvalue && (
-                    <Badge variant="outline" className="flex items-center w-[auto]">
-                    Ethnicity:{Ethnicitys.find((Ethnicity) => Ethnicity.value === Ethnicityvalue)?.label}
-                    <button
-                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                    onClick={() => setEthnicityValue("")}
-                    >
-                    X
-                    </button>
-                    </Badge>
-                )}
-                </CardDescription>
+                        {state.sexvalue && (
+                            <Badge variant="outline" className="flex items-center w-[auto]">
+                            Sex: {sexs.find((sex) => sex.value === state.sexvalue)?.label}
+                            <button
+                                className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                onClick={() => setState(prev => ({ ...prev, sexvalue: "" }))}
+                            >
+                                X
+                            </button>
+                            </Badge>
+                        )}
+                        {state.BMIvalue && (
+                            <Badge variant="outline" className="flex items-center w-[auto]">
+                            BMI: {BMIs.find((bmi) => bmi.value === state.BMIvalue)?.label}
+                            <button
+                                className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                onClick={() => setState(prev => ({ ...prev, BMIvalue: "" }))}
+                            >
+                                X
+                            </button>
+                            </Badge>
+                        )}
+                        {state.Ethnicityvalue && (
+                            <Badge variant="outline" className="flex items-center w-[auto]">
+                            Ethnicity: {Ethnicitys.find((Ethnicity) => Ethnicity.value === state.Ethnicityvalue)?.label}
+                            <button
+                                className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                onClick={() => setState(prev => ({ ...prev, Ethnicityvalue: "" }))}
+                            >
+                                X
+                            </button>
+                            </Badge>
+                        )}
+                        </CardDescription>
+
                 </CardHeader>
                 <CardContent className="flex space-x-10">
                     {/* Left Side: Top 5 Diagnosis Methods */}
