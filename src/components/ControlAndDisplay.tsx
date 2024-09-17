@@ -1,5 +1,5 @@
 
-import React, { useState,useMemo } from 'react';
+import React, { useState,useMemo,useEffect  } from 'react';
 import { Box, Grid, TextField,  Chip, FormControl, InputLabel, Select, MenuItem,  Typography } from '@mui/material';
 import TuneIcon from '@mui/icons-material/Tune';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
@@ -12,11 +12,26 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { addDays, format, isWithinInterval } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
+import { DayPicker } from "react-day-picker";
 import { DateRange } from "react-day-picker"
 import { Calendar } from "@/components/ui/calendar"
 import { Badge } from "@/components/ui/badge"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+  } from "@/components/ui/alert-dialog"
+  
 import { TrendingUp } from "lucide-react"
 import {
     Table,
@@ -320,8 +335,7 @@ const initialDummyData = [{
 
 const ControlAndDisplay: React.FC = () => {
 
-    
-
+   
       const [age, setAge] = useState("");
       const handleAgeChange = (e: { target: { value: any; }; }) => {
         let agevalue = e.target.value;
@@ -351,16 +365,18 @@ const ControlAndDisplay: React.FC = () => {
     //const [sex] = useState('');
     // const [filteredData, setFilteredData] = useState(initialDummyData);
     
-    const [date, setDate] = useState(null);
-
+    const [fromDate, setFromDate] = useState(null);
+    const [toDate, setToDate] = useState(null);
+    
     const filteredData = useMemo(() => {
-      if (date?.from && date?.to) {
+      if (fromDate && toDate) {
         return initialDummyData.filter((d) =>
-          isWithinInterval(new Date(d.time), { start: date.from, end: date.to })
+          isWithinInterval(new Date(d.time), { start: fromDate, end: toDate })
         );
       }
-      return initialDummyData; // If no date is selected, show all data
-    }, [date, initialDummyData]);
+      return initialDummyData; 
+    }, [fromDate, toDate, initialDummyData]);
+    
 
     // const handleFilterApply = () => {
     //     const newFilter = `Sex: ${sex}`;
@@ -384,6 +400,20 @@ const ControlAndDisplay: React.FC = () => {
     // const handleSexChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     //     setSex(event.target.value as string);
     // };
+    
+        const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+        useEffect(() => {
+            const handleResize = () => {
+                setIsSmallScreen(window.innerWidth <= 380);
+            };
+
+            window.addEventListener('resize', handleResize);
+
+            return () => {
+                window.removeEventListener('resize', handleResize);
+            };
+        }, []);
    
     
 
@@ -396,18 +426,20 @@ const ControlAndDisplay: React.FC = () => {
                     <CardTitle>Control Panel</CardTitle>
                     <CardDescription>Card Description</CardDescription>
                 </CardHeader>
-                <CardContent className="flex space-x-4">
+                <CardContent  className="flex space-x-4">
 
                     {/**Age */}
-                    <input  
-                        className='w-[100px]'  
+                    
+                        <Input  
+                        className='w-[auto] '  
                         type="number"  
                         placeholder="Age" 
                         min={0}
                         max={120} 
                         value={age}
-                        onChange={handleAgeChange} 
+                        onChange={handleAgeChange}  
                         />  
+                    
 
                     {/**Select Sex */}
                     <Popover open={state.sexopen}  onOpenChange={(open) => setState(prev => ({ ...prev, sexopen: open }))}>
@@ -557,46 +589,56 @@ const ControlAndDisplay: React.FC = () => {
 
 
                        {/** Calendar Component */}
-                            <div className="grid gap-2">
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                <Button
-                                    id="date"
-                                    variant={"outline"}
-                                    className={cn(
-                                    "w-[auto] justify-start text-left font-normal",
-                                    !date && "text-muted-foreground"
-                                    )}
-                                >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {date?.from ? (
-                                    date.to ? (
-                                        <>
-                                        {format(date.from, "MMM yyyy")} - {format(date.to, "MMM yyyy")}
-                                        </>
-                                    ) : (
-                                        format(date.from, "MMM yyyy")
-                                    )
-                                    ) : (
-                                    <span>Pick a date</span>
-                                    )}
-                                </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0" align="start">
-                                <Calendar
-                                    initialFocus
-                                    mode="range"
-                                    defaultMonth={date?.from}
-                                    selected={date}
-                                    onSelect={setDate}
-                                    numberOfMonths={2}
-                                />
-                                </PopoverContent>
-                            </Popover>
-                            </div>
+                       <div className="flex space-x-4">
+                                {/* From Date Picker */}
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                    <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                        "w-[auto] justify-start text-left font-normal",
+                                        !fromDate && "text-muted-foreground"
+                                        )}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {fromDate ? format(fromDate, "PPP") : <span>Pick a start date</span>}
+                                    </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                    <Calendar
+                                        mode="single"
+                                        selected={fromDate}
+                                        onSelect={setFromDate}
+                                        initialFocus
+                                    />
+                                    </PopoverContent>
+                                </Popover>
 
-
-
+                                {/* To Date Picker */}
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                    <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                        "w-[auto] justify-start text-left font-normal",
+                                        !toDate && "text-muted-foreground"
+                                        )}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {toDate ? format(toDate, "PPP") : <span>Pick an end date</span>}
+                                    </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                    <Calendar
+                                        mode="single"
+                                        selected={toDate}
+                                        onSelect={setToDate}
+                                        initialFocus
+                                    />
+                                    </PopoverContent>
+                                </Popover>
+                        </div>
+                            
                 </CardContent>
             </Card>
 
@@ -666,6 +708,20 @@ const ControlAndDisplay: React.FC = () => {
                                             }}
                                             />
                                             <span className="font-medium">{diagnosi.diagnosis}</span>
+                                            <AlertDialog>
+                                                <AlertDialogTrigger>...</AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                    <AlertDialogTitle> This is {diagnosi.diagnosis}'s diagnosis.</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        This is {diagnosi.diagnosis}'s diagnosis.
+                                                    </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                                </AlertDialog>
                                         </TableCell>
                                         <TableCell className="text-right pr-4 py-4 font-medium"> 
                                             {diagnosi.count}
