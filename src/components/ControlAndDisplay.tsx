@@ -428,7 +428,7 @@ const ControlAndDisplay: React.FC = () => {
         <Box sx={{ padding: 2}}>
 
             {/* Top Section: Filters */}
-            <Card>
+            <Card className="w-[auto] mb-4">
                 <CardHeader>
                     <CardTitle>Control Panel</CardTitle>
                     <CardDescription className="flex space-x-2">
@@ -475,11 +475,16 @@ const ControlAndDisplay: React.FC = () => {
                         )}
                         </CardDescription>
                 </CardHeader>
-                <CardContent  className="flex space-x-4">
-                    {/**Age */}
-                    
+                <CardContent  className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+                {/* flex: 启用 Flexbox 布局模型。默认情况下，Flexbox 会将子项沿水平方向排列（即行方向）。
+                    flex-col: 将 Flexbox 布局方向设置为列方向，使子项垂直堆叠（即一项在另一项之下）。
+                    space-y-4: 在子项之间添加垂直间距。4 表示一个特定的间距单位（通常是 1rem 或 16px），在列布局中，子项之间会有垂直的空隙。
+                    md:flex-row: 从中等屏幕 (md) 起，布局方向改为行方向，使子项水平排列。这个类会覆盖 flex-col 布局，使子项在中等及更大屏幕上水平排列。
+                    md:space-y-0: 从中等屏幕 (md) 起，移除垂直间距。因为在行布局中不需要垂直间距，所以需要设置为 0。
+                    md:space-x-4: 从中等屏幕 (md) 起，添加水平间距。4 代表一个特定的间距单位（通常是 1rem 或 16px），在行布局中，子项之间会有水平的空隙。 */}
+                   {/**Age */}
                         <Input  
-                        className='w-[auto] '  
+                        className="w-[100px] h-9 px-4 py-2"
                         type="number"  
                         placeholder="Age" 
                         min={0}
@@ -487,7 +492,7 @@ const ControlAndDisplay: React.FC = () => {
                         value={age}
                         onChange={handleAgeChange}  
                         />  
-                    
+                  
 
                     {/**Select Sex */}
                     <Popover open={state.sexopen}  onOpenChange={(open) => setState(prev => ({ ...prev, sexopen: open }))}>
@@ -496,7 +501,7 @@ const ControlAndDisplay: React.FC = () => {
                             variant="outline"
                             role="combobox"
                             aria-expanded={state.sexopen}
-                            className="w-[200px] justify-between"
+                            className="w-[220px] justify-between "
                             >
                             {state.sexvalue
                                 ? sexs.find((sex) => sex.value === state.sexvalue)?.label
@@ -504,7 +509,7 @@ const ControlAndDisplay: React.FC = () => {
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-[200px] p-0">
+                        <PopoverContent className="w-[220px] p-0">
                             <Command>
                             <CommandList>
                                 <CommandEmpty>No sex found.</CommandEmpty>
@@ -545,7 +550,7 @@ const ControlAndDisplay: React.FC = () => {
                             variant="outline" //定义按钮样式。
                             role="combobox" //指定按钮的角色为下拉选择框。
                             aria-expanded={state.BMIopen}
-                            className="w-[200px] justify-between"
+                            className="w-[220px] justify-between"
                             >
                             {state.BMIvalue
                                 ? BMIs.find((bmi) => bmi.value === state.BMIvalue)?.label
@@ -554,7 +559,7 @@ const ControlAndDisplay: React.FC = () => {
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />{/* 这是一个图标组件，表示上下双向的箭头。 */}
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-[200px] p-0">
+                        <PopoverContent className="w-[auto] p-0">
                             <Command>
                             <CommandList>
                                 <CommandEmpty>No BMI found.</CommandEmpty>
@@ -606,7 +611,7 @@ const ControlAndDisplay: React.FC = () => {
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-[220px] p-0">
+                        <PopoverContent className="w-[auto] p-0">
                             <Command>
                             <CommandList>
                                 <CommandEmpty>No Ethnicity found.</CommandEmpty>
@@ -672,15 +677,16 @@ const ControlAndDisplay: React.FC = () => {
             </Card>
 
             {/* Bottom Section */}
-            <Card>
+           
+            <Card >
                 <CardHeader>
                     <CardTitle >Trends</CardTitle>
                     <CardDescription ></CardDescription>
 
                 </CardHeader>
-                <CardContent className="flex space-x-10">
+                <CardContent className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
                     {/* Left Side: Top 5 Diagnosis Methods */}
-                    <Card className="w-[400px] h-[auto]">
+                    <Card className="w-[auto] h-[auto]">
                         <CardHeader>
                             <CardTitle>Top 5 Diagnosis Methods</CardTitle>
                             <CardDescription>Card Description</CardDescription>
@@ -730,8 +736,10 @@ const ControlAndDisplay: React.FC = () => {
                                 </Table>
                             </CardContent>
                     </Card>
+                    
+
                     {/*  Chart */}
-                    <Card className="w-[850px] h-[auto]">
+                    <Card className="w-[auto] h-[auto]">
                         <CardHeader>
                             <CardTitle>Chart</CardTitle>
                             <CardDescription>This is chart</CardDescription>
@@ -767,7 +775,7 @@ const ControlAndDisplay: React.FC = () => {
                                     margin={{
                                         top: 10,
                                         right: 30,
-                                        left: 0,
+                                        left: 30,
                                         bottom: 0,
                                     }}
                                     >
