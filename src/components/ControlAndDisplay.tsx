@@ -371,16 +371,19 @@ const ControlAndDisplay: React.FC = () => {
     const [toDate, setToDate] = useState(null);
   
     const filteredData = useMemo(() => {
+        //useMemo 钩子用于优化性能，它只在 fromDate、toDate 或 initialDummyData 发生变化时重新计算 filteredData，避免每次渲染都重新计算筛选结果。
         if (fromDate && toDate) {
+            //首先检查是否已经选择了开始和结束日期。如果两者都存在，则进行数据筛选。
           return initialDummyData.filter((d) =>
             isWithinInterval(new Date(d.time), {
+                //判断这个日期是否在开始和结束月份之间：
               start: moment(fromDate, monthFormat).startOf('month').toDate(), 
               end: moment(toDate, monthFormat).endOf('month').toDate(), 
-            })
+            })//筛选 initialDummyData 数组，条件是数据的 time 属性在指定的日期范围内。
           );
         }
         return initialDummyData;
-      }, [fromDate, toDate, initialDummyData]);
+      }, [fromDate, toDate, initialDummyData]);//依赖数组，它决定了 useMemo 何时重新计算 filteredData。
 
     // const handleFilterApply = () => {
     //     const newFilter = `Sex: ${sex}`;
@@ -441,17 +444,24 @@ const ControlAndDisplay: React.FC = () => {
                             </button>
                             </Badge>
                         )}
+
+                        {/* 这是一个条件渲染语句。
+                        只有当 state.BMIvalue 不为空时，才会渲染 Badge 组件，表示当用户选择了某个 BMI 选项时，显示该选项。 */}
                         {state.BMIvalue && (
                             <Badge variant="outline" className="flex items-center w-[auto]">
-                            BMI: {BMIs.find((bmi) => bmi.value === state.BMIvalue)?.label}
+                            BMI: {BMIs.find((bmi) => bmi.value === state.BMIvalue)?.label}{/* 这是badge显示的文本，BMI: 之后跟着选中的 BMI 标签。 */}
                             <button
                                 className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
                                 onClick={() => setState(prev => ({ ...prev, BMIvalue: "" }))}
+                                //当用户点击按钮时，会触发 onClick 事件。
+                                //在事件回调中，调用 setState，将 BMIvalue 设置为空字符串（""），表示取消当前选中的 BMI 值。
+                                //取消后，Badge 组件将不再显示，因为 state.BMIvalue 为空，Badge不会再渲染。
                             >
                                 X
                             </button>
                             </Badge>
                         )}
+
                         {state.Ethnicityvalue && (
                             <Badge variant="outline" className="flex items-center w-[auto]">
                             Ethnicity: {Ethnicitys.find((Ethnicity) => Ethnicity.value === state.Ethnicityvalue)?.label}
@@ -527,20 +537,21 @@ const ControlAndDisplay: React.FC = () => {
                     </Popover>
 
                     {/** Select BMI */}
-                        <Popover 
-                        open={state.BMIopen} 
-                        onOpenChange={(open) => setState(prev => ({ ...prev, BMIopen: open }))}>
-                        <PopoverTrigger asChild>
+                        <Popover //是一个包裹组件，它控制弹出框（或称下拉框）的打开和关闭状态。
+                        open={state.BMIopen} //根据状态来决定是否展示弹出框。
+                        onOpenChange={(open) => setState(prev => ({ ...prev, BMIopen: open }))}>{/* 当弹出框状态变化时更新状态。 */}
+                        <PopoverTrigger asChild>  
                             <Button
-                            variant="outline"
-                            role="combobox"
+                            variant="outline" //定义按钮样式。
+                            role="combobox" //指定按钮的角色为下拉选择框。
                             aria-expanded={state.BMIopen}
                             className="w-[200px] justify-between"
                             >
                             {state.BMIvalue
                                 ? BMIs.find((bmi) => bmi.value === state.BMIvalue)?.label
                                 : "Select BMI"}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                {/* 如果当前有选择的 BMI，则显示其标签，否则显示默认的 "Select BMI"。 */}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />{/* 这是一个图标组件，表示上下双向的箭头。 */}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-[200px] p-0">
@@ -551,7 +562,7 @@ const ControlAndDisplay: React.FC = () => {
                                 {BMIs.map((bmi) => (
                                     <CommandItem
                                     key={bmi.value}
-                                    value={bmi.value}
+                                    value={bmi.value} //这是选项的值属性，用于标识该选项的具体值。
                                     onSelect={(currentValue) => {
                                         setState(prev => ({
                                         ...prev,
@@ -559,12 +570,14 @@ const ControlAndDisplay: React.FC = () => {
                                         BMIopen: false
                                         }));
                                     }}
+                                    //当用户选择某个选项时，调用 onSelect 回调更新状态。
                                     >
                                     <Check
                                         className={cn(
                                         "mr-2 h-4 w-4",
                                         state.BMIvalue === bmi.value ? "opacity-100" : "opacity-0"
                                         )}
+                                        //如果当前项被选中，图标的透明度为 100%；否则透明度为 0。
                                     />
                                     {bmi.label}
                                     </CommandItem>
@@ -632,10 +645,14 @@ const ControlAndDisplay: React.FC = () => {
                             <div>
                                 <MonthPicker
                                 className="h-9 px-4 py-2"
-                                format={monthFormat}
-                                placeholder="Pick a start month"
-                                value={fromDate ? moment(fromDate, monthFormat) : null}
+                                format={monthFormat}//monthFormat 是日期的格式，比如 YYYY-MM，表示年-月格式。这样确保选择器的输入和输出符合特定格式。
+                                placeholder="Pick a start month"//在选择器内显示占位符，提示用户选择开始月份。
+                                value={fromDate ? moment(fromDate, monthFormat) : null}//value 用于设置当前选择的值：
+                                //如果 fromDate 存在（即用户已选择开始月份），则将 fromDate 转换为 moment 对象（使用指定的 monthFormat），并作为选择器的当前值。
+                                //如果 fromDate 不存在，选择器的值为 null，即未选择状态。
                                 onChange={(date, dateString) => setFromDate(dateString)}
+                                //当用户选择了月份时，触发 onChange 事件：
+                                //dateString 是格式化后的日期字符串，将其传给 setFromDate，更新 fromDate 的状态。
                                 />
                             </div>
 
@@ -674,10 +691,12 @@ const ControlAndDisplay: React.FC = () => {
                                     <TableRow>
                                         <TableHead className="font-semibold text-left pl-4">Diagnosis</TableHead>
                                         <TableHead className="font-semibold text-right pr-4">Count</TableHead>
+                                        {/* 表头部分，定义了 "Diagnosis"（诊断名称）和 "Count"（计数）两列，分别显示诊断方法及其对应的计数。 */}
                                     </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                     {diagnosis.map((diagnosi) => (
+                                        //通过 diagnosis.map() 遍历诊断数据，并为每个诊断生成一行数据。
                                         <TableRow key={diagnosi.diagnosis} className="hover:bg-gray-50">
                                         <TableCell className="flex items-center space-x-2 pl-4 py-4"> 
                                             <Badge  
@@ -688,6 +707,7 @@ const ControlAndDisplay: React.FC = () => {
                                             <span className="font-medium">{diagnosi.diagnosis}</span>
                                             <AlertDialog>
                                                 <AlertDialogTrigger>...</AlertDialogTrigger>
+                                                {/* 对话框的触发器，这里用 ... 作为触发元素，点击后会弹出对话框。 */}
                                                 <AlertDialogContent>
                                                     <AlertDialogHeader>
                                                     <AlertDialogTitle> This is {diagnosi.diagnosis}'s diagnosis.</AlertDialogTitle>
@@ -718,11 +738,12 @@ const ControlAndDisplay: React.FC = () => {
                         </CardHeader>
                         <CardContent >
                                 <RadioGroup  
+                                //用于提供指标的选择，用户可以选择 WBC（白细胞）、HGB（血红蛋白）、或 RBC（红细胞计数）。
                                 className="flex space-x-2"
                                 aria-label="metric"
                                 name="metric"
-                                value={selectedMetric}
-                                onValueChange={handleMetricChange}
+                                value={selectedMetric} //当前选中的指标值，如 "WBC"、"HGB" 或 "RBC"。
+                                onValueChange={handleMetricChange} //当用户选择不同的指标时，调用 handleMetricChange 函数更新 selectedMetric 的值。
                                 > 
                                 <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="WBC" id="option-one" />
@@ -742,7 +763,7 @@ const ControlAndDisplay: React.FC = () => {
                                 <ComposedChart
                                     width={500}
                                     height={400}
-                                    data={filteredData}
+                                    data={filteredData} //传入的数据源 filteredData，用于绘制图表。
                                     margin={{
                                         top: 10,
                                         right: 30,
@@ -751,12 +772,17 @@ const ControlAndDisplay: React.FC = () => {
                                     }}
                                     >
                                 <CartesianGrid strokeDasharray="3 3" />
+                                {/* 绘制图表的网格线，strokeDasharray="3 3" 表示网格线为虚线。 */}
                                 <XAxis dataKey="time" />
+                                {/* 设置 X 轴，dataKey="time" 表示 X 轴的数据来自数据源中的 time 字段。 */}
                                 <YAxis label={{ value: selectedMetric, angle: -90, position: 'insideLeft', textAnchor: 'middle' }} domain={['auto', 'auto']}/>
+                                {/* 设置 Y 轴，label 属性用于设置 Y 轴的标签，selectedMetric 动态指定标签内容。domain={['auto', 'auto']} 使 Y 轴的范围自动调整。 */}
                                 <Tooltip  />
                                 <Legend  />
                                     {selectedMetric === "WBC" && (
                                         <>
+                                        {/* 如果 selectedMetric 为 "WBC"，则绘制表示男性和女性白细胞计数的数据。
+                                        Area 元素绘制填充区域，Line 元素绘制线条，分别用不同颜色表示不同的数据。 */}
                                         <Area  dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
                                         <Line  dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
                                         <Area  dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#8884d8"/>
@@ -765,6 +791,7 @@ const ControlAndDisplay: React.FC = () => {
                                     )}
                                      {selectedMetric === "HGB" && (
                                         <>
+                                        {/* 如果 selectedMetric 为 "HGB"，图表内容与 WBC 类似，但显示的是血红蛋白数据。 */}
                                         <Area  dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
                                         <Line  dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
                                         <Area  dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#8884d8"/>
@@ -773,6 +800,7 @@ const ControlAndDisplay: React.FC = () => {
                                     )}
                                     {selectedMetric === "RBC" && (
                                         <>
+                                        {/* 如果 selectedMetric 为 "RBC"，图表显示多条线条，分别表示正常和不同程度贫血等情况。 */}
                                         <Line  dataKey={`Normal${selectedMetric}`} stroke="#228B22" />
                                         <Line  dataKey={`MildAnemia${selectedMetric}`} stroke="#EEEE00" />
                                         <Line  dataKey={`ModerateAnemia${selectedMetric}`} stroke="#EE7942" />
