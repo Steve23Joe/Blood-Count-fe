@@ -58,6 +58,7 @@ import {
 import { Close } from '@radix-ui/react-dialog';
 
 
+
 const diagnosis = [
     {
         "diagnosis": "Normal",
@@ -365,10 +366,10 @@ const ControlAndDisplay: React.FC = () => {
     // const [filteredData, setFilteredData] = useState(initialDummyData);
     
    
-    const { MonthPicker, RangePicker } = DatePicker;
+    const { MonthPicker} = DatePicker;
     const monthFormat = 'YYYY/MM';
-    const [fromDate, setFromDate] = useState(null);
-    const [toDate, setToDate] = useState(null);
+    const [fromDate, setFromDate] = useState("2024/01");
+    const [toDate, setToDate] = useState("2024/10");
   
     const filteredData = useMemo(() => {
         //useMemo 钩子用于优化性能，它只在 fromDate、toDate 或 initialDummyData 发生变化时重新计算 filteredData，避免每次渲染都重新计算筛选结果。
@@ -408,22 +409,6 @@ const ControlAndDisplay: React.FC = () => {
     //     setSex(event.target.value as string);
     // };
     
-        const [isSmallScreen, setIsSmallScreen] = useState(false);
-
-        useEffect(() => {
-            const handleResize = () => {
-                setIsSmallScreen(window.innerWidth <= 380);
-            };
-
-            window.addEventListener('resize', handleResize);
-
-            return () => {
-                window.removeEventListener('resize', handleResize);
-            };
-        }, []);
-   
-    
-
     return (
         <Box sx={{ padding: 2}}>
 
@@ -431,8 +416,7 @@ const ControlAndDisplay: React.FC = () => {
             <Card className="w-[auto] mb-4">
                 <CardHeader>
                     <CardTitle>Control Panel</CardTitle>
-                    <CardDescription className="flex space-x-2">
-                        <>Chips:</>
+                    <CardDescription className="flex space-x-2">Chips:<u></u>
                         {state.sexvalue && (
                             <Badge variant="outline" className="flex items-center w-[auto]">
                             Sex: {sexs.find((sex) => sex.value === state.sexvalue)?.label}
@@ -550,10 +534,12 @@ const ControlAndDisplay: React.FC = () => {
                             variant="outline" //定义按钮样式。
                             role="combobox" //指定按钮的角色为下拉选择框。
                             aria-expanded={state.BMIopen}
-                            className="w-[220px] justify-between"
+                            className="w-[240px] justify-between"
                             >
                             {state.BMIvalue
                                 ? BMIs.find((bmi) => bmi.value === state.BMIvalue)?.label
+                                // 使用 find 方法在 BMIs 中查找满足条件的元素。条件是该元素的 value 属性与当前的 state.BMIvalue 相等。
+
                                 : "Select BMI"}
                                 {/* 如果当前有选择的 BMI，则显示其标签，否则显示默认的 "Select BMI"。 */}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />{/* 这是一个图标组件，表示上下双向的箭头。 */}
@@ -568,10 +554,11 @@ const ControlAndDisplay: React.FC = () => {
                                     <CommandItem
                                     key={bmi.value}
                                     value={bmi.value} //这是选项的值属性，用于标识该选项的具体值。
-                                    onSelect={(currentValue) => {
+                                    onSelect={(currentValue) => {//定义了一个在特定事件发生时执行的函数，该函数接收一个参数 currentValue，代表当前被选中的值。
                                         setState(prev => ({
                                         ...prev,
                                         BMIvalue: currentValue === state.BMIvalue ? "" : currentValue,
+                                        //如果 currentValue 与当前状态中的 BMIvalue 相等，将 BMIvalue 设置为空字符串 ""；否则，将其设置为 currentValue。
                                         BMIopen: false
                                         }));
                                     }}
@@ -603,7 +590,7 @@ const ControlAndDisplay: React.FC = () => {
                             variant="outline"
                             role="combobox"
                             aria-expanded={state.Ethnicityopen}
-                            className="w-[220px] justify-between"
+                            className="w-[260px] justify-between"
                             >
                             {state.Ethnicityvalue
                                 ? Ethnicitys.find((Ethnicity) => Ethnicity.value === state.Ethnicityvalue)?.label
@@ -655,7 +642,7 @@ const ControlAndDisplay: React.FC = () => {
                                 value={fromDate ? moment(fromDate, monthFormat) : null}//value 用于设置当前选择的值：
                                 //如果 fromDate 存在（即用户已选择开始月份），则将 fromDate 转换为 moment 对象（使用指定的 monthFormat），并作为选择器的当前值。
                                 //如果 fromDate 不存在，选择器的值为 null，即未选择状态。
-                                onChange={(date, dateString) => setFromDate(dateString)}
+                                onChange={(date, dateString) => setFromDate(dateString as string)}
                                 //当用户选择了月份时，触发 onChange 事件：
                                 //dateString 是格式化后的日期字符串，将其传给 setFromDate，更新 fromDate 的状态。
                                 />
@@ -668,7 +655,7 @@ const ControlAndDisplay: React.FC = () => {
                                 format={monthFormat}
                                 placeholder="Pick an end month"
                                 value={toDate ? moment(toDate, monthFormat) : null}
-                                onChange={(date, dateString) => setToDate(dateString)}
+                                onChange={(date,dateString) => setToDate(dateString as string)}
                                 />
                             </div>
                             </div>
