@@ -59,6 +59,21 @@ import { Close } from '@radix-ui/react-dialog';
 
 
 
+const Ages = [
+    {
+      value: "Minor(<18)",
+      label: "Minor(<18)",
+    },
+    {
+      value: "Adults(18-65)",
+      label: "Adults(18-65)",
+    },
+    {
+      value: "Elderly(>65)",
+      label: "Elderly(>65)",
+    },
+   
+  ]
 const diagnosis = [
     {
         "diagnosis": "Normal",
@@ -131,11 +146,6 @@ const sexs = [
       value: "female",
       label: "Female",
     },
-    {
-      value: "other",
-      label: "Other",
-    },
-    
   ] 
  
 
@@ -168,22 +178,176 @@ const sexs = [
   };
 
   
-const initialDummyData = [{ 
-    "time": "2024-01", 
-    "MaleWBC": 5.4,  
-    "FemaleWBC": 4.95,
-    "MaleHGB": 12.6, 
-    "FemaleHGB": 9, 
-    "NormalRBC": 4.05, 
-    "MildAnemiaRBC": 5.85, 
-    "ModerateAnemiaRBC": 8.55,
-    "SevereAnemiaRBC":9.55,
-    "PolycythemiaRBC":11.55,
-    "UL95CI_MaleWBC": [5.67, 5.13],
-    "UL95CI_FemaleWBC": [5.2, 4.7],
-    "UL95CI_MaleHGB": [13.23, 11.97],
-    "UL95CI_FemaleHGB": [9.45, 8.55]
-},
+const initialDummyData = [
+    
+    { 
+        "time": "2024-01", 
+        "Age":12,
+        "sex":"female", 
+        "FemaleWBC": 14.95,
+        "FemaleHGB": 9, 
+        "NormalRBC": 4.05, 
+        "MildAnemiaRBC": 5.85, 
+        "ModerateAnemiaRBC": 8.55,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_FemaleWBC": [5.2, 4.7],
+        "UL95CI_FemaleHGB": [9.45, 8.55]
+    },  
+    { 
+        "time": "2024-01", 
+        "Age":12,
+        "sex":"male",
+        "MaleWBC": 5.4,  
+        "MaleHGB": 12.6, 
+        "NormalRBC": 4.05, 
+        "MildAnemiaRBC": 5.85, 
+        "ModerateAnemiaRBC": 8.55,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_MaleWBC": [5.67, 5.13],
+        "UL95CI_MaleHGB": [13.23, 11.97],
+    },
+    { 
+        "time": "2024-01", 
+        "Age":32,
+        "sex":"female",
+        "FemaleWBC": 4.95,
+        "FemaleHGB": 9, 
+        "NormalRBC": 4.05, 
+        "MildAnemiaRBC": 5.85, 
+        "ModerateAnemiaRBC": 8.55,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_FemaleWBC": [5.2, 4.7],
+        "UL95CI_FemaleHGB": [9.45, 8.55]
+    },  
+    { 
+        "time": "2024-01", 
+        "Age":72,
+        "sex":"female",
+        "FemaleWBC": 40.95,
+        "FemaleHGB": 9, 
+        "NormalRBC": 4.05, 
+        "MildAnemiaRBC": 5.85, 
+        "ModerateAnemiaRBC": 8.55,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_FemaleWBC": [5.2, 4.7],
+        "UL95CI_FemaleHGB": [9.45, 8.55]
+    },  
+    { 
+        "time": "2024-01", 
+        "Age":32,
+        "sex":"male",
+        "MaleWBC": 15.4,  
+        "MaleHGB": 12.6, 
+        "NormalRBC": 4.05, 
+        "MildAnemiaRBC": 5.85, 
+        "ModerateAnemiaRBC": 8.55,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_MaleWBC": [5.67, 5.13],
+        "UL95CI_MaleHGB": [13.23, 11.97],
+    },  
+    { 
+        "time": "2024-01", 
+        "Age":72,
+        "sex":"male",
+        "MaleWBC": 5.4,  
+        "MaleHGB": 12.6, 
+        "NormalRBC": 4.05, 
+        "MildAnemiaRBC": 5.85, 
+        "ModerateAnemiaRBC": 8.55,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_MaleWBC": [5.67, 5.13],
+        "UL95CI_MaleHGB": [13.23, 11.97],
+    },  
+    { 
+        "time": "2024-02", 
+        "Age":12,
+        "sex":"female", 
+        "FemaleWBC": 14.95,
+        "FemaleHGB": 9, 
+        "NormalRBC": 4.05, 
+        "MildAnemiaRBC": 5.85, 
+        "ModerateAnemiaRBC": 8.55,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_FemaleWBC": [5.2, 4.7],
+        "UL95CI_FemaleHGB": [9.45, 8.55]
+    },  
+    { 
+        "time": "2024-02", 
+        "Age":12,
+        "sex":"male",
+        "MaleWBC": 5.4,  
+        "MaleHGB": 12.6, 
+        "NormalRBC": 4.05, 
+        "MildAnemiaRBC": 5.85, 
+        "ModerateAnemiaRBC": 8.55,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_MaleWBC": [5.67, 5.13],
+        "UL95CI_MaleHGB": [13.23, 11.97],
+    },
+    { 
+        "time": "2024-02", 
+        "Age":32,
+        "sex":"female",
+        "FemaleWBC": 4.95,
+        "FemaleHGB": 9, 
+        "NormalRBC": 4.05, 
+        "MildAnemiaRBC": 5.85, 
+        "ModerateAnemiaRBC": 8.55,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_FemaleWBC": [5.2, 4.7],
+        "UL95CI_FemaleHGB": [9.45, 8.55]
+    },  
+    { 
+        "time": "2024-02", 
+        "Age":72,
+        "sex":"female",
+        "FemaleWBC": 40.95,
+        "FemaleHGB": 9, 
+        "NormalRBC": 4.05, 
+        "MildAnemiaRBC": 5.85, 
+        "ModerateAnemiaRBC": 8.55,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_FemaleWBC": [5.2, 4.7],
+        "UL95CI_FemaleHGB": [9.45, 8.55]
+    },  
+    { 
+        "time": "2024-02", 
+        "Age":32,
+        "sex":"male",
+        "MaleWBC": 15.4,  
+        "MaleHGB": 12.6, 
+        "NormalRBC": 4.05, 
+        "MildAnemiaRBC": 5.85, 
+        "ModerateAnemiaRBC": 8.55,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_MaleWBC": [5.67, 5.13],
+        "UL95CI_MaleHGB": [13.23, 11.97],
+    },  
+    { 
+        "time": "2024-02", 
+        "Age":72,
+        "sex":"male",
+        "MaleWBC": 5.4,  
+        "MaleHGB": 12.6, 
+        "NormalRBC": 4.05, 
+        "MildAnemiaRBC": 5.85, 
+        "ModerateAnemiaRBC": 8.55,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_MaleWBC": [5.67, 5.13],
+        "UL95CI_MaleHGB": [13.23, 11.97],
+    },  
 { 
     "time": "2024-02", 
     "MaleWBC": 4.86,  
@@ -336,19 +500,10 @@ const ControlAndDisplay: React.FC = () => {
 
        
    
-      const [age, setAge] = useState("");
-      const handleAgeChange = (e: { target: { value: any; }; }) => {
-        let agevalue = e.target.value;
-        if (agevalue < 0) {
-          agevalue = 0;
-        } else if (agevalue > 120) {
-          agevalue = 120;
-        }
-    
-        setAge(agevalue);
-    };
 
     const [state, setState] = React.useState({
+        ageopen:false,
+        agevalue:"",
         sexopen: false,
         sexvalue: "",
         BMIopen: false,
@@ -372,19 +527,42 @@ const ControlAndDisplay: React.FC = () => {
     const [toDate, setToDate] = useState("2024/10");
   
     const filteredData = useMemo(() => {
-        //useMemo 钩子用于优化性能，它只在 fromDate、toDate 或 initialDummyData 发生变化时重新计算 filteredData，避免每次渲染都重新计算筛选结果。
         if (fromDate && toDate) {
-            //首先检查是否已经选择了开始和结束日期。如果两者都存在，则进行数据筛选。
-          return initialDummyData.filter((d) =>
-            isWithinInterval(new Date(d.time), {
-                //判断这个日期是否在开始和结束月份之间：
-              start: moment(fromDate, monthFormat).startOf('month').toDate(), 
-              end: moment(toDate, monthFormat).endOf('month').toDate(), 
-            })//筛选 initialDummyData 数组，条件是数据的 time 属性在指定的日期范围内。
-          );
+            let dateFiltered = initialDummyData.filter((d) =>
+                isWithinInterval(new Date(d.time), {
+                    start: moment(fromDate, monthFormat).startOf('month').toDate(),
+                    end: moment(toDate, monthFormat).endOf('month').toDate(),
+                })
+            );
+    
+            // 年龄筛选
+            if (state.agevalue) {
+                const selectedAge = state.agevalue;
+                dateFiltered = dateFiltered.filter((data) => {
+                    const age = data.Age;
+                    if (selectedAge === "Minor(<18)" && age < 18) {
+                        return true;
+                    } else if (selectedAge === "Adults(18-65)" && age >= 18 && age <= 65) {
+                        return true;
+                    } else if (selectedAge === "Elderly(>65)" && age > 65) {
+                        return true;
+                    }
+                    return false;
+                });
+            }
+    
+            // 性别筛选
+            if (state.sexvalue) {
+                const selectedSex = state.sexvalue;
+                dateFiltered = dateFiltered.filter((data) => data.sex === selectedSex);
+            }
+    
+            return dateFiltered;
         }
         return initialDummyData;
-      }, [fromDate, toDate, initialDummyData]);//依赖数组，它决定了 useMemo 何时重新计算 filteredData。
+    }, [fromDate, toDate, initialDummyData, state.agevalue, state.sexvalue]);
+    
+    
 
     // const handleFilterApply = () => {
     //     const newFilter = `Sex: ${sex}`;
@@ -416,48 +594,6 @@ const ControlAndDisplay: React.FC = () => {
             <Card className="w-[auto] mb-4">
                 <CardHeader>
                     <CardTitle>Control Panel</CardTitle>
-                    <CardDescription className="flex space-x-2">Chips:<u></u>
-                        {state.sexvalue && (
-                            <Badge variant="outline" className="flex items-center w-[auto]">
-                            Sex: {sexs.find((sex) => sex.value === state.sexvalue)?.label}
-                            <button
-                                className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                onClick={() => setState(prev => ({ ...prev, sexvalue: "" }))}
-                            >
-                                X
-                            </button>
-                            </Badge>
-                        )}
-
-                        {/* 这是一个条件渲染语句。
-                        只有当 state.BMIvalue 不为空时，才会渲染 Badge 组件，表示当用户选择了某个 BMI 选项时，显示该选项。 */}
-                        {state.BMIvalue && (
-                            <Badge variant="outline" className="flex items-center w-[auto]">
-                            BMI: {BMIs.find((bmi) => bmi.value === state.BMIvalue)?.label}{/* 这是badge显示的文本，BMI: 之后跟着选中的 BMI 标签。 */}
-                            <button
-                                className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                onClick={() => setState(prev => ({ ...prev, BMIvalue: "" }))}
-                                //当用户点击按钮时，会触发 onClick 事件。
-                                //在事件回调中，调用 setState，将 BMIvalue 设置为空字符串（""），表示取消当前选中的 BMI 值。
-                                //取消后，Badge 组件将不再显示，因为 state.BMIvalue 为空，Badge不会再渲染。
-                            >
-                                X
-                            </button>
-                            </Badge>
-                        )}
-
-                        {state.Ethnicityvalue && (
-                            <Badge variant="outline" className="flex items-center w-[auto]">
-                            Ethnicity: {Ethnicitys.find((Ethnicity) => Ethnicity.value === state.Ethnicityvalue)?.label}
-                            <button
-                                className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                onClick={() => setState(prev => ({ ...prev, Ethnicityvalue: "" }))}
-                            >
-                                X
-                            </button>
-                            </Badge>
-                        )}
-                        </CardDescription>
                 </CardHeader>
                 <CardContent  className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
                 {/* flex: 启用 Flexbox 布局模型。默认情况下，Flexbox 会将子项沿水平方向排列（即行方向）。
@@ -467,63 +603,99 @@ const ControlAndDisplay: React.FC = () => {
                     md:space-y-0: 从中等屏幕 (md) 起，移除垂直间距。因为在行布局中不需要垂直间距，所以需要设置为 0。
                     md:space-x-4: 从中等屏幕 (md) 起，添加水平间距。4 代表一个特定的间距单位（通常是 1rem 或 16px），在行布局中，子项之间会有水平的空隙。 */}
                    {/**Age */}
-                        <Input  
-                        className="w-[100px] h-9 px-4 py-2"
-                        type="number"  
-                        placeholder="Age" 
-                        min={0}
-                        max={120} 
-                        value={age}
-                        onChange={handleAgeChange}  
-                        />  
-                  
+                   <Popover open={state.ageopen} onOpenChange={(open) => setState(prev => ({ ...prev, ageopen: open }))}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    aria-expanded={state.ageopen}
+                                    className="w-[220px] justify-between "
+                                >
+                                    {state.agevalue
+                                        ? Ages.find((age) => age.value === state.agevalue)?.label
+                                        : "Select age"}
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[220px] p-0">
+                                <Command>
+                                    <CommandList>
+                                        <CommandEmpty>No age found.</CommandEmpty>
+                                        <CommandGroup>
+                                            {Ages.map((age) => (
+                                                <CommandItem
+                                                    key={age.value}
+                                                    value={age.value}
+                                                    onSelect={(currentValue) => {
+                                                        setState(prev => ({
+                                                            ...prev,
+                                                            agevalue: currentValue === state.agevalue ? "" : currentValue,
+                                                            ageopen: false
+                                                        }));
+                                                    }}
+                                                >
+                                                    <Check
+                                                        className={cn(
+                                                            "mr-2 h-4 w-4",
+                                                            state.agevalue === age.value ? "opacity-100" : "opacity-0"
+                                                        )}
+                                                    />
+                                                    {age.label}
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
 
-                    {/**Select Sex */}
-                    <Popover open={state.sexopen}  onOpenChange={(open) => setState(prev => ({ ...prev, sexopen: open }))}>
+                    {/** Select Sex */}
+                    <Popover open={state.sexopen} onOpenChange={(open) => setState(prev => ({ ...prev, sexopen: open }))}>
                         <PopoverTrigger asChild>
                             <Button
-                            variant="outline"
-                            role="combobox"
-                            aria-expanded={state.sexopen}
-                            className="w-[220px] justify-between "
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={state.sexopen}
+                                className="w-[220px] justify-between"
                             >
-                            {state.sexvalue
-                                ? sexs.find((sex) => sex.value === state.sexvalue)?.label
-                                : "Select sex"}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                {state.sexvalue
+                                    ? sexs.find((sex) => sex.value === state.sexvalue)?.label
+                                    : "Select sex"}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-[220px] p-0">
                             <Command>
-                            <CommandList>
-                                <CommandEmpty>No sex found.</CommandEmpty>
-                                <CommandGroup>
-                                {sexs.map((sex) => (
-                                    <CommandItem
-                                    key={sex.value}
-                                    value={sex.value}
-                                    onSelect={(currentValue) => {
-                                        setState(prev => ({
-                                            ...prev,
-                                            sexvalue: currentValue === state.sexvalue ? "" : currentValue,
-                                            sexopen: false
-                                          }));
-                                    }}
-                                    >
-                                    <Check
-                                        className={cn(
-                                        "mr-2 h-4 w-4",
-                                        state.sexvalue === sex.value ? "opacity-100" : "opacity-0"
-                                        )}
-                                    />
-                                    {sex.label}
-                                    </CommandItem>
-                                ))}
-                                </CommandGroup>
-                            </CommandList>
+                                <CommandList>
+                                    <CommandEmpty>No sex found.</CommandEmpty>
+                                    <CommandGroup>
+                                        {sexs.map((sex) => (
+                                            <CommandItem
+                                                key={sex.value}
+                                                value={sex.value}
+                                                onSelect={(currentValue) => {
+                                                    setState(prev => ({
+                                                        ...prev,
+                                                        sexvalue: currentValue === state.sexvalue ? "" : currentValue,
+                                                        sexopen: false
+                                                    }));
+                                                }}
+                                            >
+                                                <Check
+                                                    className={cn(
+                                                        "mr-2 h-4 w-4",
+                                                        state.sexvalue === sex.value ? "opacity-100" : "opacity-0"
+                                                    )}
+                                                />
+                                                {sex.label}
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </CommandList>
                             </Command>
                         </PopoverContent>
                     </Popover>
+
 
                     {/** Select BMI */}
                         <Popover //是一个包裹组件，它控制弹出框（或称下拉框）的打开和关闭状态。
@@ -661,6 +833,83 @@ const ControlAndDisplay: React.FC = () => {
                             </div>
                             
                 </CardContent>
+                <CardFooter>
+                Chips:<u></u>
+                        {state.agevalue && (
+                                    <Badge variant="outline" className="flex items-center w-[auto]">
+                                    Age: {Ages.find((age) => age.value === state.agevalue)?.label}
+                                    <button
+                                        className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                        onClick={() => setState(prev => ({ ...prev, agevalue: "" }))}
+                                    >
+                                        X
+                                    </button>
+                                    </Badge>
+                                )}
+                        {state.sexvalue && (
+                            <Badge variant="outline" className="flex items-center w-[auto]">
+                            Sex: {sexs.find((sex) => sex.value === state.sexvalue)?.label}
+                            <button
+                                className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                onClick={() => setState(prev => ({ ...prev, sexvalue: "" }))}
+                            >
+                                X
+                            </button>
+                            </Badge>
+                        )}
+
+                        {/* 这是一个条件渲染语句。
+                        只有当 state.BMIvalue 不为空时，才会渲染 Badge 组件，表示当用户选择了某个 BMI 选项时，显示该选项。 */}
+                        {state.BMIvalue && (
+                            <Badge variant="outline" className="flex items-center w-[auto]">
+                            BMI: {BMIs.find((bmi) => bmi.value === state.BMIvalue)?.label}{/* 这是badge显示的文本，BMI: 之后跟着选中的 BMI 标签。 */}
+                            <button
+                                className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                onClick={() => setState(prev => ({ ...prev, BMIvalue: "" }))}
+                                //当用户点击按钮时，会触发 onClick 事件。
+                                //在事件回调中，调用 setState，将 BMIvalue 设置为空字符串（""），表示取消当前选中的 BMI 值。
+                                //取消后，Badge 组件将不再显示，因为 state.BMIvalue 为空，Badge不会再渲染。
+                            >
+                                X
+                            </button>
+                            </Badge>
+                        )}
+
+                        {state.Ethnicityvalue && (
+                            <Badge variant="outline" className="flex items-center w-[auto]">
+                            Ethnicity: {Ethnicitys.find((Ethnicity) => Ethnicity.value === state.Ethnicityvalue)?.label}
+                            <button
+                                className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                onClick={() => setState(prev => ({ ...prev, Ethnicityvalue: "" }))}
+                            >
+                                X
+                            </button>
+                            </Badge>
+                        )}
+                        {fromDate && (
+                            <Badge variant="outline" className="flex items - center w - [auto]">
+                                FromDate: {fromDate}
+                                <button
+                                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                    onClick={() => setFromDate('')}
+                                >
+                                    X
+                                </button>
+                            </Badge>
+                        )}
+
+                        {toDate && (
+                            <Badge variant="outline" className="flex items - center w - [auto]">
+                                ToDate: {toDate}
+                                <button
+                                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                    onClick={() => setToDate('')}
+                                >
+                                    X
+                                </button>
+                            </Badge>
+                        )}
+                </CardFooter>
             </Card>
 
             {/* Bottom Section */}
