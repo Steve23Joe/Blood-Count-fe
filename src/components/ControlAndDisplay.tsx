@@ -1244,6 +1244,18 @@ const ControlAndDisplay: React.FC = () => {
         </Popover>
     );
 
+    const renderBadge = (label, value, clearValue) => (
+        <Badge variant="outline" className="flex items-center w-[auto]">
+          {label}: {value}
+          <button
+            className="ml-4 h-6 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+            onClick={clearValue}
+          >
+            X
+          </button>
+        </Badge>
+      );
+
     // const handleFilterApply = () => {
     //     const newFilter = `Sex: ${sex}`;
     //     if (!selectedFilters.includes(newFilter) && sex) {
@@ -1353,80 +1365,49 @@ const ControlAndDisplay: React.FC = () => {
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
                 Chips:<u></u>
-                        {state.agevalue && (
-                                    <Badge variant="outline" className="flex items-center w-[auto]">
-                                    Age: {Ages.find((age) => age.value === state.agevalue)?.label}
-                                    <button
-                                        className="ml-4 h-6 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                        onClick={() => setState(prev => ({ ...prev, agevalue: "" }))}
-                                    >
-                                        X
-                                    </button>
-                                    </Badge>
-                                )}
-                       {state.sexvalue && state.sexvalue !== "all" && (
-                                <Badge variant="outline" className="flex items-center w-[auto]">
-                                    Sex: {sexs.find((sex) => sex.value === state.sexvalue)?.label}
-                                    <button
-                                    className="ml-4 h-6 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                    onClick={() => setState((prev) => ({ ...prev, sexvalue: "all" }))}
-                                    >
-                                    X
-                                    </button>
-                                </Badge>
-                        )}
+                <>
+                            {state.agevalue &&
+                            renderBadge(
+                                "Age",
+                                Ages.find((age) => age.value === state.agevalue)?.label,
+                                () => setState((prev) => ({ ...prev, agevalue: "" }))
+                            )}
 
-                        {/* 这是一个条件渲染语句。
-                        只有当 state.BMIvalue 不为空时，才会渲染 Badge 组件，表示当用户选择了某个 BMI 选项时，显示该选项。 */}
-                        {state.BMIvalue && (
-                            <Badge variant="outline" className="flex items-center w-[auto]">
-                            BMI: {BMIs.find((bmi) => bmi.value === state.BMIvalue)?.label}{/* 这是badge显示的文本，BMI: 之后跟着选中的 BMI 标签。 */}
-                            <button
-                                className="ml-4 h-6 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                onClick={() => setState(prev => ({ ...prev, BMIvalue: "" }))}
-                                //当用户点击按钮时，会触发 onClick 事件。
-                                //在事件回调中，调用 setState，将 BMIvalue 设置为空字符串（""），表示取消当前选中的 BMI 值。
-                                //取消后，Badge 组件将不再显示，因为 state.BMIvalue 为空，Badge不会再渲染。
-                            >
-                                X
-                            </button>
-                            </Badge>
-                        )}
+                            {state.sexvalue && state.sexvalue !== "all" &&
+                            renderBadge(
+                                "Sex",
+                                sexs.find((sex) => sex.value === state.sexvalue)?.label,
+                                () => setState((prev) => ({ ...prev, sexvalue: "all" }))
+                            )}
 
-                        {state.Ethnicityvalue && (
-                            <Badge variant="outline" className="flex items-center w-[auto]">
-                            Ethnicity: {Ethnicitys.find((Ethnicity) => Ethnicity.value === state.Ethnicityvalue)?.label}
-                            <button
-                                className="ml-4 h-6 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                onClick={() => setState(prev => ({ ...prev, Ethnicityvalue: "" }))}
-                            >
-                                X
-                            </button>
-                            </Badge>
-                        )}
-                         {fromDate && (
-                            <Badge variant="outline" className="flex items-center">
-                                From Date: {moment(fromDate).format(monthFormat)}
-                                <button
-                                    className="ml-4 h-6 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                    onClick={() => setFromDate(null)}
-                                >
-                                    X
-                                </button>
-                            </Badge>
-                        )}
+                            {state.BMIvalue &&
+                            renderBadge(
+                                "BMI",
+                                BMIs.find((bmi) => bmi.value === state.BMIvalue)?.label,
+                                () => setState((prev) => ({ ...prev, BMIvalue: "" }))
+                            )}
 
-                        {toDate && (
-                            <Badge variant="outline" className="flex items-center">
-                                To Date: {moment(toDate).format(monthFormat)}
-                                <button
-                                    className="ml-4 h-6 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                    onClick={() => setToDate(null)}
-                                >
-                                    X
-                                </button>
-                            </Badge>
-                        )}
+                            {state.Ethnicityvalue &&
+                            renderBadge(
+                                "Ethnicity",
+                                Ethnicitys.find((Ethnicity) => Ethnicity.value === state.Ethnicityvalue)?.label,
+                                () => setState((prev) => ({ ...prev, Ethnicityvalue: "" }))
+                            )}
+
+                            {fromDate &&
+                            renderBadge(
+                                "From Date",
+                                moment(fromDate).format(monthFormat),
+                                () => setFromDate(null)
+                            )}
+
+                            {toDate &&
+                            renderBadge(
+                                "To Date",
+                                moment(toDate).format(monthFormat),
+                                () => setToDate(null)
+                            )}
+                        </>
                 </CardFooter>
             </Card>
 
