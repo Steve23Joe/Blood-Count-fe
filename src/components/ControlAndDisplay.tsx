@@ -60,7 +60,6 @@ import {
 import { Close } from '@radix-ui/react-dialog';
 
 
-
 const Ages = [
     {
       value: "Minor(<18)",
@@ -1176,10 +1175,11 @@ const ControlAndDisplay: React.FC = () => {
         }
 
         // 年龄筛选
-        if (state.agevalue) {
-            const selectedAge = state.agevalue;
-    
-            filtered = filtered.filter((data) => {
+        if (!state.agevalue) {
+            return [];
+        }
+        const selectedAge = state.agevalue;
+        filtered = filtered.filter((data) => {
                 const age = data.Age;
                 if (selectedAge === "Minor(<18)" && age < 18) {
                     return true;
@@ -1190,7 +1190,7 @@ const ControlAndDisplay: React.FC = () => {
                 }
                 return false;
             });
-        }
+        
     
         // 性别筛选
         if (state.sexvalue) {
@@ -1209,7 +1209,7 @@ const ControlAndDisplay: React.FC = () => {
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
-                    className="h-9 px-4 py-2 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="h-18 px-12 py-4 border rounded-lg shadow-md text-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
                 >
                     {value ? options.find(option => option.value === value)?.label : placeholder}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -1255,7 +1255,6 @@ const ControlAndDisplay: React.FC = () => {
     //     setFilteredData(newFilteredData);
     // };
 
-
     const handleMetricChange = (newValue: string) => {  
         setSelectedMetric(newValue);  
     }; 
@@ -1276,13 +1275,7 @@ const ControlAndDisplay: React.FC = () => {
                     <CardTitle>Control Panel</CardTitle>
                 </CardHeader>
                 <CardContent  className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
-                {/* flex: 启用 Flexbox 布局模型。默认情况下，Flexbox 会将子项沿水平方向排列（即行方向）。
-                    flex-col: 将 Flexbox 布局方向设置为列方向，使子项垂直堆叠（即一项在另一项之下）。
-                    space-y-4: 在子项之间添加垂直间距。4 表示一个特定的间距单位（通常是 1rem 或 16px），在列布局中，子项之间会有垂直的空隙。
-                    md:flex-row: 从中等屏幕 (md) 起，布局方向改为行方向，使子项水平排列。这个类会覆盖 flex-col 布局，使子项在中等及更大屏幕上水平排列。
-                    md:space-y-0: 从中等屏幕 (md) 起，移除垂直间距。因为在行布局中不需要垂直间距，所以需要设置为 0。
-                    md:space-x-4: 从中等屏幕 (md) 起，添加水平间距。4 代表一个特定的间距单位（通常是 1rem 或 16px），在行布局中，子项之间会有水平的空隙。 */}
-                        <SelectPopover 
+                <SelectPopover 
                             open={state.ageopen} 
                             onOpenChange={open => setState(prev => ({ ...prev, ageopen: open }))}
                             value={state.agevalue}
@@ -1322,11 +1315,10 @@ const ControlAndDisplay: React.FC = () => {
                             noOptionsText="No Ethnicity found."
                         />
 
-
                             {/* From Month Picker */}
                             <div>
                                 <DatePicker
-                                    className="h-9 px-4 py-2 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    className="h-18 w-40 px-4 py-4 border rounded-lg shadow-md text-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
                                     selected={fromDate}
                                     onChange={(date) => {
                                         setFromDate(date);
@@ -1343,7 +1335,7 @@ const ControlAndDisplay: React.FC = () => {
                             {/* To Month Picker */}
                             <div>
                                 <DatePicker
-                                    className="h-9 px-4  py-2 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    className="h-18 w-40 px-4 py-4 border rounded-lg shadow-md text-xl focus:outline-none focus:ring-2 focus:ring-blue-400"
                                     selected={toDate}
                                     onChange={(date) => {
                                         setToDate(date);
@@ -1359,13 +1351,13 @@ const ControlAndDisplay: React.FC = () => {
                    
                             
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
                 Chips:<u></u>
                         {state.agevalue && (
                                     <Badge variant="outline" className="flex items-center w-[auto]">
                                     Age: {Ages.find((age) => age.value === state.agevalue)?.label}
                                     <button
-                                        className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                        className="ml-4 h-6 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
                                         onClick={() => setState(prev => ({ ...prev, agevalue: "" }))}
                                     >
                                         X
@@ -1376,7 +1368,7 @@ const ControlAndDisplay: React.FC = () => {
                                 <Badge variant="outline" className="flex items-center w-[auto]">
                                     Sex: {sexs.find((sex) => sex.value === state.sexvalue)?.label}
                                     <button
-                                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                    className="ml-4 h-6 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
                                     onClick={() => setState((prev) => ({ ...prev, sexvalue: "all" }))}
                                     >
                                     X
@@ -1390,7 +1382,7 @@ const ControlAndDisplay: React.FC = () => {
                             <Badge variant="outline" className="flex items-center w-[auto]">
                             BMI: {BMIs.find((bmi) => bmi.value === state.BMIvalue)?.label}{/* 这是badge显示的文本，BMI: 之后跟着选中的 BMI 标签。 */}
                             <button
-                                className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                className="ml-4 h-6 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
                                 onClick={() => setState(prev => ({ ...prev, BMIvalue: "" }))}
                                 //当用户点击按钮时，会触发 onClick 事件。
                                 //在事件回调中，调用 setState，将 BMIvalue 设置为空字符串（""），表示取消当前选中的 BMI 值。
@@ -1405,7 +1397,7 @@ const ControlAndDisplay: React.FC = () => {
                             <Badge variant="outline" className="flex items-center w-[auto]">
                             Ethnicity: {Ethnicitys.find((Ethnicity) => Ethnicity.value === state.Ethnicityvalue)?.label}
                             <button
-                                className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                className="ml-4 h-6 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
                                 onClick={() => setState(prev => ({ ...prev, Ethnicityvalue: "" }))}
                             >
                                 X
@@ -1416,7 +1408,7 @@ const ControlAndDisplay: React.FC = () => {
                             <Badge variant="outline" className="flex items-center">
                                 From Date: {moment(fromDate).format(monthFormat)}
                                 <button
-                                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                    className="ml-4 h-6 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
                                     onClick={() => setFromDate(null)}
                                 >
                                     X
@@ -1428,7 +1420,7 @@ const ControlAndDisplay: React.FC = () => {
                             <Badge variant="outline" className="flex items-center">
                                 To Date: {moment(toDate).format(monthFormat)}
                                 <button
-                                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                    className="ml-4 h-6 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
                                     onClick={() => setToDate(null)}
                                 >
                                     X
@@ -1448,7 +1440,7 @@ const ControlAndDisplay: React.FC = () => {
                 </CardHeader>
                 <CardContent className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
                     {/* Left Side: Top 5 Diagnosis Methods */}
-                    <Card className="w-[auto] h-[auto]">
+                    <Card className="w-[500px] h-[auto]">
                         <CardHeader>
                             <CardTitle>Top 5 Diagnosis Methods</CardTitle>
                             <CardDescription>Card Description</CardDescription>
@@ -1531,8 +1523,6 @@ const ControlAndDisplay: React.FC = () => {
                             <ChartContainer config={chartConfig} className="chart-container">
                                 {/** Chart Component */}
                                 <ComposedChart
-                                    width={500}
-                                    height={400}
                                     data={filteredData} //传入的数据源 filteredData，用于绘制图表。
                                     margin={{
                                         top: 10,
@@ -1599,3 +1589,4 @@ const ControlAndDisplay: React.FC = () => {
 };
 
 export default ControlAndDisplay;
+
