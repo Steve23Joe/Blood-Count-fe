@@ -14,7 +14,9 @@ import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { addDays, format, isWithinInterval } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
-import { DatePicker } from 'antd';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
+import './style.css'; // 根据你的项目结构调整路径
 import moment from 'moment';
 import { Calendar } from "@/components/ui/calendar"
 import { Badge } from "@/components/ui/badge"
@@ -146,6 +148,10 @@ const sexs = [
       value: "female",
       label: "Female",
     },
+    {
+        value: "all",
+        label: "All",
+      },
   ] 
  
 
@@ -178,10 +184,478 @@ const sexs = [
   };
 
   
-  const initialDummyData = [{ 
+  const initialDummyData = [
+{ 
+"time": "2024-01", 
+"Age":12,
+"sex":"all",
+"MaleWBC": 5.4,  
+"FemaleWBC": 4.95,
+"MaleHGB": 12.6, 
+"FemaleHGB": 9, 
+"NormalRBC": 4.05, 
+"MildAnemiaRBC": 5.85, 
+"ModerateAnemiaRBC": 8.55,
+"SevereAnemiaRBC":9.55,
+"PolycythemiaRBC":11.55,
+"UL95CI_MaleWBC": [5.67, 5.13],
+"UL95CI_FemaleWBC": [5.2, 4.7],
+"UL95CI_MaleHGB": [13.23, 11.97],
+"UL95CI_FemaleHGB": [9.45, 8.55]
+},
+{ 
+"time": "2024-02", 
+"Age":12,
+"sex":"all",
+"MaleWBC": 4.86,  
+"FemaleWBC": 4.46,
+"MaleHGB": 11.34, 
+"FemaleHGB": 8.1, 
+"NormalRBC": 3.645, 
+"MildAnemiaRBC": 5.265, 
+"ModerateAnemiaRBC": 7.695,
+"SevereAnemiaRBC":8.55,
+"PolycythemiaRBC":10.55,
+"UL95CI_MaleWBC": [5.1, 4.62],
+"UL95CI_FemaleWBC": [4.68, 4.23],
+"UL95CI_MaleHGB": [11.91, 10.78],
+"UL95CI_FemaleHGB": [8.51, 7.7]
+
+},
+{ 
+"time": "2024-03", 
+"Age":12,
+"sex":"all",
+"MaleWBC": 5.589,  
+"FemaleWBC": 5.129,
+"MaleHGB": 13.04, 
+"FemaleHGB": 9.315, 
+"NormalRBC": 4.1925, 
+"MildAnemiaRBC": 6.1275, 
+"ModerateAnemiaRBC": 8.9325,
+"SevereAnemiaRBC":7.55,
+"PolycythemiaRBC":9.55,
+"UL95CI_MaleWBC": [5.87, 5.31],
+"UL95CI_FemaleWBC": [5.39, 4.87],
+"UL95CI_MaleHGB": [13.69, 12.39],
+"UL95CI_FemaleHGB": [9.78, 8.85]
+
+},
+{ 
+"time": "2024-04", 
+"Age":12,
+"sex":"all",
+"MaleWBC": 5.03,  
+"FemaleWBC": 4.616,
+"MaleHGB": 11.74, 
+"FemaleHGB": 8.38, 
+"NormalRBC": 3.773, 
+"MildAnemiaRBC": 5.542, 
+"ModerateAnemiaRBC": 8.06,
+"SevereAnemiaRBC":6.55,
+"PolycythemiaRBC":8.55,
+"UL95CI_MaleWBC": [5.28, 4.78],
+"UL95CI_FemaleWBC": [4.85, 4.39],
+"UL95CI_MaleHGB": [12.33, 11.15],
+"UL95CI_FemaleHGB": [8.8, 7.96]
+},
+{ 
+"time": "2024-05", 
+"Age":12,
+"sex":"all",
+"MaleWBC": 5.308,
+"FemaleWBC": 5.7845,  
+"MaleHGB": 13.5, 
+"FemaleHGB": 9.64, 
+"NormalRBC": 4.338, 
+"MildAnemiaRBC": 6.373, 
+"ModerateAnemiaRBC": 9.28,
+"SevereAnemiaRBC":5.55,
+"PolycythemiaRBC":7.55,
+"UL95CI_MaleWBC": [5.57, 5.04],
+"UL95CI_FemaleWBC": [6.07, 5.5],
+"UL95CI_MaleHGB": [14.18, 12.83],
+"UL95CI_FemaleHGB": [10.12, 9.16]
+},
+{ 
+"time": "2024-06", 
+"Age":12,
+"sex":"all",
+"MaleWBC": 5.206,  
+"FemaleWBC": 4.777,
+"MaleHGB": 12.15, 
+"FemaleHGB": 8.676, 
+"NormalRBC": 3.904, 
+"MildAnemiaRBC": 5.736, 
+"ModerateAnemiaRBC": 8.36,
+"SevereAnemiaRBC":4.55,
+"PolycythemiaRBC":6.55,
+"UL95CI_MaleWBC": [5.47, 4.94],
+"UL95CI_FemaleWBC": [5.02, 4.54],
+"UL95CI_MaleHGB": [12.76, 11.55],
+"UL95CI_FemaleHGB": [9.11, 8.24]
+},
+{ 
+"time": "2024-07", 
+"Age":12,
+"sex":"all",
+"MaleWBC": 5.986,  
+"FemaleWBC": 5.493,
+"MaleHGB": 13.97, 
+"FemaleHGB": 9.977, 
+"NormalRBC": 4.49, 
+"MildAnemiaRBC": 6.6, 
+"ModerateAnemiaRBC": 9.6,
+"SevereAnemiaRBC":9.55,
+"PolycythemiaRBC":11.55,
+"UL95CI_MaleWBC": [6.29, 5.69],
+"UL95CI_FemaleWBC": [5.77, 5.22],
+"UL95CI_MaleHGB": [14.66, 13.27],
+"UL95CI_FemaleHGB": [10.48, 9.48]
+},
+{ 
+"time": "2024-08", 
+"Age":12,
+"sex":"all",
+"MaleWBC":  4.944,
+"FemaleWBC": 5.387,
+"MaleHGB": 12.58, 
+"FemaleHGB": 8.979, 
+"NormalRBC": 4.041, 
+"MildAnemiaRBC": 5.94, 
+"ModerateAnemiaRBC": 8.64,
+"SevereAnemiaRBC":10.55,
+"PolycythemiaRBC":12.55,
+"UL95CI_MaleWBC": [5.19, 4.7],
+"UL95CI_FemaleWBC": [5.66, 5.11],
+"UL95CI_MaleHGB": [13.21, 11.95],
+"UL95CI_FemaleHGB": [9.43, 8.53]
+},
+{ 
+"time": "2024-09", 
+"Age":12,
+"sex":"all",
+"MaleWBC": 6.195,  
+"FemaleWBC": 5.685,
+"MaleHGB": 14.47, 
+"FemaleHGB": 10.33, 
+"NormalRBC": 4.647, 
+"MildAnemiaRBC": 6.837, 
+"ModerateAnemiaRBC": 9.945,
+"SevereAnemiaRBC":11.55,
+"PolycythemiaRBC":13.55,
+"UL95CI_MaleWBC": [6.51, 5.88],
+"UL95CI_FemaleWBC": [5.97, 5.4],
+"UL95CI_MaleHGB": [15.19, 13.74],
+"UL95CI_FemaleHGB": [10.85, 9.81]
+},
+{ 
+"time": "2024-10", 
+"Age":12,
+"sex":"all",
+"MaleWBC": 5.575,  
+"FemaleWBC": 5.116,
+"MaleHGB": 13.02, 
+"FemaleHGB": 9.297, 
+"NormalRBC": 4.182, 
+"MildAnemiaRBC": 6.156, 
+"ModerateAnemiaRBC": 8.964,
+"SevereAnemiaRBC":9.55,
+"PolycythemiaRBC":11.55,
+"UL95CI_MaleWBC": [5.85, 5.29],
+"UL95CI_FemaleWBC": [5.37, 4.86],
+"UL95CI_MaleHGB": [13.67, 12.37],
+"UL95CI_FemaleHGB": [9.76, 8.83]
+},
+{ 
+"time": "2024-02", 
+"Age":12,
+"sex":"male",
+"MaleWBC": 5.4,  
+"MaleHGB": 12.6, 
+"NormalRBC": 4.05, 
+"MildAnemiaRBC": 5.85, 
+"ModerateAnemiaRBC": 8.55,
+"SevereAnemiaRBC":9.55,
+"PolycythemiaRBC":11.55,
+"UL95CI_MaleWBC": [5.67, 5.13],
+"UL95CI_MaleHGB": [13.23, 11.97],
+},
+{ 
+"time": "2024-03", 
+"Age":12,
+"sex":"male",
+"MaleWBC": 4.86,  
+"MaleHGB": 11.34, 
+"NormalRBC": 3.645, 
+"MildAnemiaRBC": 5.265, 
+"ModerateAnemiaRBC": 7.695,
+"SevereAnemiaRBC":8.55,
+"PolycythemiaRBC":10.55,
+"UL95CI_MaleWBC": [5.1, 4.62],
+"UL95CI_MaleHGB": [11.91, 10.78],
+
+},
+{ 
+"time": "2024-04", 
+"Age":12,
+"sex":"male",
+"MaleWBC": 5.589,  
+"MaleHGB": 13.04, 
+"NormalRBC": 4.1925, 
+"MildAnemiaRBC": 6.1275, 
+"ModerateAnemiaRBC": 8.9325,
+"SevereAnemiaRBC":7.55,
+"PolycythemiaRBC":9.55,
+"UL95CI_MaleWBC": [5.87, 5.31],
+"UL95CI_MaleHGB": [13.69, 12.39],
+
+},
+{ 
+"time": "2024-05", 
+"Age":12,
+"sex":"male",
+"MaleWBC": 5.03,  
+"MaleHGB": 11.74, 
+"NormalRBC": 3.773, 
+"MildAnemiaRBC": 5.542, 
+"ModerateAnemiaRBC": 8.06,
+"SevereAnemiaRBC":6.55,
+"PolycythemiaRBC":8.55,
+"UL95CI_MaleWBC": [5.28, 4.78],
+"UL95CI_MaleHGB": [12.33, 11.15],
+},
+{ 
+"time": "2024-06", 
+"Age":12,
+"sex":"male",
+"MaleWBC": 5.308,
+"MaleHGB": 13.5, 
+"NormalRBC": 4.338, 
+"MildAnemiaRBC": 6.373, 
+"ModerateAnemiaRBC": 9.28,
+"SevereAnemiaRBC":5.55,
+"PolycythemiaRBC":7.55,
+"UL95CI_MaleWBC": [5.57, 5.04],
+"UL95CI_MaleHGB": [14.18, 12.83],
+},
+{ 
+"time": "2024-07", 
+"Age":12,
+"sex":"male",
+"MaleWBC": 5.206,  
+"MaleHGB": 12.15, 
+"NormalRBC": 3.904, 
+"MildAnemiaRBC": 5.736, 
+"ModerateAnemiaRBC": 8.36,
+"SevereAnemiaRBC":4.55,
+"PolycythemiaRBC":6.55,
+"UL95CI_MaleWBC": [5.47, 4.94],
+"UL95CI_MaleHGB": [12.76, 11.55],
+},
+{ 
+"time": "2024-08", 
+"Age":12,
+"sex":"male",
+"MaleWBC": 5.986,  
+"MaleHGB": 13.97, 
+"NormalRBC": 4.49, 
+"MildAnemiaRBC": 6.6, 
+"ModerateAnemiaRBC": 9.6,
+"SevereAnemiaRBC":9.55,
+"PolycythemiaRBC":11.55,
+"UL95CI_MaleWBC": [6.29, 5.69],
+"UL95CI_MaleHGB": [14.66, 13.27],
+},
+{ 
+"time": "2024-09", 
+"Age":12,
+"sex":"male",
+"MaleWBC":  4.944,
+"MaleHGB": 12.58, 
+"NormalRBC": 4.041, 
+"MildAnemiaRBC": 5.94, 
+"ModerateAnemiaRBC": 8.64,
+"SevereAnemiaRBC":10.55,
+"PolycythemiaRBC":12.55,
+"UL95CI_MaleWBC": [5.19, 4.7],
+"UL95CI_MaleHGB": [13.21, 11.95],
+},
+{ 
+"time": "2024-10", 
+"Age":12,
+"sex":"male",
+"MaleWBC": 6.195,  
+"MaleHGB": 14.47, 
+"NormalRBC": 4.647, 
+"MildAnemiaRBC": 6.837, 
+"ModerateAnemiaRBC": 9.945,
+"SevereAnemiaRBC":11.55,
+"PolycythemiaRBC":13.55,
+"UL95CI_MaleWBC": [6.51, 5.88],
+"UL95CI_MaleHGB": [15.19, 13.74],
+},
+{ 
+"time": "2024-11", 
+"Age":12,
+"sex":"male",
+"MaleWBC": 5.575,  
+"MaleHGB": 13.02, 
+"NormalRBC": 4.182, 
+"MildAnemiaRBC": 6.156, 
+"ModerateAnemiaRBC": 8.964,
+"SevereAnemiaRBC":9.55,
+"PolycythemiaRBC":11.55,
+"UL95CI_MaleWBC": [5.85, 5.29],
+"UL95CI_MaleHGB": [13.67, 12.37],
+},
+    { 
     "time": "2024-01", 
     "Age":12,
-    "sex":"male",
+    "sex":"female",
+    "FemaleWBC": 4.95,
+    "FemaleHGB": 9, 
+    "NormalRBC": 4.05, 
+    "MildAnemiaRBC": 5.85, 
+    "ModerateAnemiaRBC": 8.55,
+    "SevereAnemiaRBC":9.55,
+    "PolycythemiaRBC":11.55,
+    "UL95CI_FemaleWBC": [5.2, 4.7],
+    "UL95CI_FemaleHGB": [9.45, 8.55]
+    },
+    { 
+    "time": "2024-02", 
+    "Age":12,
+    "sex":"female",
+    "FemaleWBC": 4.46,
+    "FemaleHGB": 8.1, 
+    "NormalRBC": 3.645, 
+    "MildAnemiaRBC": 5.265, 
+    "ModerateAnemiaRBC": 7.695,
+    "SevereAnemiaRBC":8.55,
+    "PolycythemiaRBC":10.55,
+    "UL95CI_FemaleWBC": [4.68, 4.23],
+    "UL95CI_FemaleHGB": [8.51, 7.7]
+    
+    },
+    { 
+    "time": "2024-03", 
+    "Age":12,
+    "sex":"female",
+    "FemaleWBC": 5.129,
+    "FemaleHGB": 9.315, 
+    "NormalRBC": 4.1925, 
+    "MildAnemiaRBC": 6.1275, 
+    "ModerateAnemiaRBC": 8.9325,
+    "SevereAnemiaRBC":7.55,
+    "PolycythemiaRBC":9.55,
+    "UL95CI_FemaleWBC": [5.39, 4.87],
+    "UL95CI_FemaleHGB": [9.78, 8.85]
+    
+    },
+    { 
+    "time": "2024-04", 
+    "Age":12,
+    "sex":"female",
+    "FemaleWBC": 4.616,
+    "FemaleHGB": 8.38, 
+    "NormalRBC": 3.773, 
+    "MildAnemiaRBC": 5.542, 
+    "ModerateAnemiaRBC": 8.06,
+    "SevereAnemiaRBC":6.55,
+    "PolycythemiaRBC":8.55,
+    "UL95CI_FemaleWBC": [4.85, 4.39],
+    "UL95CI_FemaleHGB": [8.8, 7.96]
+    },
+    { 
+    "time": "2024-05", 
+    "Age":12,
+    "sex":"female",
+    "FemaleWBC": 5.7845,  
+    "FemaleHGB": 9.64, 
+    "NormalRBC": 4.338, 
+    "MildAnemiaRBC": 6.373, 
+    "ModerateAnemiaRBC": 9.28,
+    "SevereAnemiaRBC":5.55,
+    "PolycythemiaRBC":7.55,
+    "UL95CI_FemaleWBC": [6.07, 5.5],
+    "UL95CI_FemaleHGB": [10.12, 9.16]
+    },
+    { 
+    "time": "2024-06", 
+    "Age":12,
+    "sex":"female",
+    "FemaleWBC": 4.777,
+    "FemaleHGB": 8.676, 
+    "NormalRBC": 3.904, 
+    "MildAnemiaRBC": 5.736, 
+    "ModerateAnemiaRBC": 8.36,
+    "SevereAnemiaRBC":4.55,
+    "PolycythemiaRBC":6.55,
+    "UL95CI_FemaleWBC": [5.02, 4.54],
+    "UL95CI_FemaleHGB": [9.11, 8.24]
+    },
+    { 
+    "time": "2024-07", 
+    "Age":12,
+    "sex":"female",
+    "FemaleWBC": 5.493,
+    "FemaleHGB": 9.977, 
+    "NormalRBC": 4.49, 
+    "MildAnemiaRBC": 6.6, 
+    "ModerateAnemiaRBC": 9.6,
+    "SevereAnemiaRBC":9.55,
+    "PolycythemiaRBC":11.55,
+    "UL95CI_FemaleWBC": [5.77, 5.22],
+    "UL95CI_FemaleHGB": [10.48, 9.48]
+    },
+    { 
+    "time": "2024-08", 
+    "Age":12,
+    "sex":"female",
+    "FemaleWBC": 5.387,
+    "FemaleHGB": 8.979, 
+    "NormalRBC": 4.041, 
+    "MildAnemiaRBC": 5.94, 
+    "ModerateAnemiaRBC": 8.64,
+    "SevereAnemiaRBC":10.55,
+    "PolycythemiaRBC":12.55,
+    "UL95CI_FemaleWBC": [5.66, 5.11],
+    "UL95CI_FemaleHGB": [9.43, 8.53]
+    },
+    { 
+    "time": "2024-09", 
+    "Age":12,
+    "sex":"female",
+    "FemaleWBC": 5.685,
+    "FemaleHGB": 10.33, 
+    "NormalRBC": 4.647, 
+    "MildAnemiaRBC": 6.837, 
+    "ModerateAnemiaRBC": 9.945,
+    "SevereAnemiaRBC":11.55,
+    "PolycythemiaRBC":13.55,
+    "UL95CI_FemaleWBC": [5.97, 5.4],
+    "UL95CI_FemaleHGB": [10.85, 9.81]
+    },
+    { 
+    "time": "2024-10", 
+    "Age":12,
+    "sex":"female",
+    "FemaleWBC": 5.116,
+    "FemaleHGB": 9.297, 
+    "NormalRBC": 4.182, 
+    "MildAnemiaRBC": 6.156, 
+    "ModerateAnemiaRBC": 8.964,
+    "SevereAnemiaRBC":9.55,
+    "PolycythemiaRBC":11.55,
+    "UL95CI_FemaleWBC": [5.37, 4.86],
+    "UL95CI_FemaleHGB": [9.76, 8.83]
+    },
+    
+{ 
+    "time": "2024-02", 
+    "Age":32,
+    "sex":"all",
     "MaleWBC": 5.4,  
     "FemaleWBC": 4.95,
     "MaleHGB": 12.6, 
@@ -195,11 +669,11 @@ const sexs = [
     "UL95CI_FemaleWBC": [5.2, 4.7],
     "UL95CI_MaleHGB": [13.23, 11.97],
     "UL95CI_FemaleHGB": [9.45, 8.55]
-},
-{ 
-    "time": "2024-02", 
-    "Age":12,
-    "sex":"male",
+    },
+    { 
+    "time": "2024-03", 
+    "Age":32,
+    "sex":"all",
     "MaleWBC": 4.86,  
     "FemaleWBC": 4.46,
     "MaleHGB": 11.34, 
@@ -213,12 +687,12 @@ const sexs = [
     "UL95CI_FemaleWBC": [4.68, 4.23],
     "UL95CI_MaleHGB": [11.91, 10.78],
     "UL95CI_FemaleHGB": [8.51, 7.7]
-
-},
-{ 
-    "time": "2024-03", 
-    "Age":72,
-    "sex":"female",
+    
+    },
+    { 
+    "time": "2024-04", 
+    "Age":32,
+    "sex":"all",
     "MaleWBC": 5.589,  
     "FemaleWBC": 5.129,
     "MaleHGB": 13.04, 
@@ -232,12 +706,12 @@ const sexs = [
     "UL95CI_FemaleWBC": [5.39, 4.87],
     "UL95CI_MaleHGB": [13.69, 12.39],
     "UL95CI_FemaleHGB": [9.78, 8.85]
-
-},
-{ 
-    "time": "2024-04", 
-    "Age":12,
-    "sex":"male",
+    
+    },
+    { 
+    "time": "2024-05", 
+    "Age":32,
+    "sex":"all",
     "MaleWBC": 5.03,  
     "FemaleWBC": 4.616,
     "MaleHGB": 11.74, 
@@ -251,11 +725,11 @@ const sexs = [
     "UL95CI_FemaleWBC": [4.85, 4.39],
     "UL95CI_MaleHGB": [12.33, 11.15],
     "UL95CI_FemaleHGB": [8.8, 7.96]
-},
-{ 
-    "time": "2024-05", 
-    "Age":72,
-    "sex":"female",
+    },
+    { 
+    "time": "2024-06", 
+    "Age":32,
+    "sex":"all",
     "MaleWBC": 5.308,
     "FemaleWBC": 5.7845,  
     "MaleHGB": 13.5, 
@@ -269,11 +743,11 @@ const sexs = [
     "UL95CI_FemaleWBC": [6.07, 5.5],
     "UL95CI_MaleHGB": [14.18, 12.83],
     "UL95CI_FemaleHGB": [10.12, 9.16]
-},
-{ 
-    "time": "2024-06", 
-    "Age":12,
-    "sex":"male",
+    },
+    { 
+    "time": "2024-07", 
+    "Age":32,
+    "sex":"all",
     "MaleWBC": 5.206,  
     "FemaleWBC": 4.777,
     "MaleHGB": 12.15, 
@@ -287,11 +761,11 @@ const sexs = [
     "UL95CI_FemaleWBC": [5.02, 4.54],
     "UL95CI_MaleHGB": [12.76, 11.55],
     "UL95CI_FemaleHGB": [9.11, 8.24]
-},
-{ 
-    "time": "2024-07", 
-    "Age":12,
-    "sex":"male",
+    },
+    { 
+    "time": "2024-08", 
+    "Age":32,
+    "sex":"all",
     "MaleWBC": 5.986,  
     "FemaleWBC": 5.493,
     "MaleHGB": 13.97, 
@@ -305,11 +779,11 @@ const sexs = [
     "UL95CI_FemaleWBC": [5.77, 5.22],
     "UL95CI_MaleHGB": [14.66, 13.27],
     "UL95CI_FemaleHGB": [10.48, 9.48]
-},
-{ 
-    "time": "2024-08", 
-    "Age":72,
-    "sex":"female",
+    },
+    { 
+    "time": "2024-09", 
+    "Age":32,
+    "sex":"all",
     "MaleWBC":  4.944,
     "FemaleWBC": 5.387,
     "MaleHGB": 12.58, 
@@ -323,11 +797,11 @@ const sexs = [
     "UL95CI_FemaleWBC": [5.66, 5.11],
     "UL95CI_MaleHGB": [13.21, 11.95],
     "UL95CI_FemaleHGB": [9.43, 8.53]
-},
-{ 
-    "time": "2024-09", 
-    "Age":12,
-    "sex":"male",
+    },
+    { 
+    "time": "2024-10", 
+    "Age":32,
+    "sex":"all",
     "MaleWBC": 6.195,  
     "FemaleWBC": 5.685,
     "MaleHGB": 14.47, 
@@ -341,11 +815,11 @@ const sexs = [
     "UL95CI_FemaleWBC": [5.97, 5.4],
     "UL95CI_MaleHGB": [15.19, 13.74],
     "UL95CI_FemaleHGB": [10.85, 9.81]
-},
-{ 
-    "time": "2024-10", 
-    "Age":72,
-    "sex":"female",
+    },
+    { 
+    "time": "2024-11", 
+    "Age":32,
+    "sex":"all",
     "MaleWBC": 5.575,  
     "FemaleWBC": 5.116,
     "MaleHGB": 13.02, 
@@ -359,7 +833,291 @@ const sexs = [
     "UL95CI_FemaleWBC": [5.37, 4.86],
     "UL95CI_MaleHGB": [13.67, 12.37],
     "UL95CI_FemaleHGB": [9.76, 8.83]
-}
+    },
+    { 
+    "time": "2024-01", 
+    "Age":32,
+    "sex":"male",
+    "MaleWBC": 5.4,  
+    "MaleHGB": 12.6, 
+    "NormalRBC": 4.05, 
+    "MildAnemiaRBC": 5.85, 
+    "ModerateAnemiaRBC": 8.55,
+    "SevereAnemiaRBC":9.55,
+    "PolycythemiaRBC":11.55,
+    "UL95CI_MaleWBC": [5.67, 5.13],
+    "UL95CI_MaleHGB": [13.23, 11.97],
+    },
+    { 
+    "time": "2024-02", 
+    "Age":32,
+    "sex":"male",
+    "MaleWBC": 4.86,  
+    "MaleHGB": 11.34, 
+    "NormalRBC": 3.645, 
+    "MildAnemiaRBC": 5.265, 
+    "ModerateAnemiaRBC": 7.695,
+    "SevereAnemiaRBC":8.55,
+    "PolycythemiaRBC":10.55,
+    "UL95CI_MaleWBC": [5.1, 4.62],
+    "UL95CI_MaleHGB": [11.91, 10.78],
+    
+    },
+    { 
+    "time": "2024-03", 
+    "Age":32,
+    "sex":"male",
+    "MaleWBC": 5.589,  
+    "MaleHGB": 13.04, 
+    "NormalRBC": 4.1925, 
+    "MildAnemiaRBC": 6.1275, 
+    "ModerateAnemiaRBC": 8.9325,
+    "SevereAnemiaRBC":7.55,
+    "PolycythemiaRBC":9.55,
+    "UL95CI_MaleWBC": [5.87, 5.31],
+    "UL95CI_MaleHGB": [13.69, 12.39],
+    
+    },
+    { 
+    "time": "2024-04", 
+    "Age":32,
+    "sex":"male",
+    "MaleWBC": 5.03,  
+    "MaleHGB": 11.74, 
+    "NormalRBC": 3.773, 
+    "MildAnemiaRBC": 5.542, 
+    "ModerateAnemiaRBC": 8.06,
+    "SevereAnemiaRBC":6.55,
+    "PolycythemiaRBC":8.55,
+    "UL95CI_MaleWBC": [5.28, 4.78],
+    "UL95CI_MaleHGB": [12.33, 11.15],
+    },
+    { 
+    "time": "2024-05", 
+    "Age":32,
+    "sex":"male",
+    "MaleWBC": 5.308,
+    "MaleHGB": 13.5, 
+    "NormalRBC": 4.338, 
+    "MildAnemiaRBC": 6.373, 
+    "ModerateAnemiaRBC": 9.28,
+    "SevereAnemiaRBC":5.55,
+    "PolycythemiaRBC":7.55,
+    "UL95CI_MaleWBC": [5.57, 5.04],
+    "UL95CI_MaleHGB": [14.18, 12.83],
+    },
+    { 
+    "time": "2024-06", 
+    "Age":32,
+    "sex":"male",
+    "MaleWBC": 5.206,  
+    "MaleHGB": 12.15, 
+    "NormalRBC": 3.904, 
+    "MildAnemiaRBC": 5.736, 
+    "ModerateAnemiaRBC": 8.36,
+    "SevereAnemiaRBC":4.55,
+    "PolycythemiaRBC":6.55,
+    "UL95CI_MaleWBC": [5.47, 4.94],
+    "UL95CI_MaleHGB": [12.76, 11.55],
+    },
+    { 
+    "time": "2024-07", 
+    "Age":32,
+    "sex":"male",
+    "MaleWBC": 5.986,  
+    "MaleHGB": 13.97, 
+    "NormalRBC": 4.49, 
+    "MildAnemiaRBC": 6.6, 
+    "ModerateAnemiaRBC": 9.6,
+    "SevereAnemiaRBC":9.55,
+    "PolycythemiaRBC":11.55,
+    "UL95CI_MaleWBC": [6.29, 5.69],
+    "UL95CI_MaleHGB": [14.66, 13.27],
+    },
+    { 
+    "time": "2024-08", 
+    "Age":32,
+    "sex":"male",
+    "MaleWBC":  4.944,
+    "MaleHGB": 12.58, 
+    "NormalRBC": 4.041, 
+    "MildAnemiaRBC": 5.94, 
+    "ModerateAnemiaRBC": 8.64,
+    "SevereAnemiaRBC":10.55,
+    "PolycythemiaRBC":12.55,
+    "UL95CI_MaleWBC": [5.19, 4.7],
+    "UL95CI_MaleHGB": [13.21, 11.95],
+    },
+    { 
+    "time": "2024-09", 
+    "Age":32,
+    "sex":"male",
+    "MaleWBC": 6.195,  
+    "MaleHGB": 14.47, 
+    "NormalRBC": 4.647, 
+    "MildAnemiaRBC": 6.837, 
+    "ModerateAnemiaRBC": 9.945,
+    "SevereAnemiaRBC":11.55,
+    "PolycythemiaRBC":13.55,
+    "UL95CI_MaleWBC": [6.51, 5.88],
+    "UL95CI_MaleHGB": [15.19, 13.74],
+    },
+    { 
+    "time": "2024-10", 
+    "Age":32,
+    "sex":"male",
+    "MaleWBC": 5.575,  
+    "MaleHGB": 13.02, 
+    "NormalRBC": 4.182, 
+    "MildAnemiaRBC": 6.156, 
+    "ModerateAnemiaRBC": 8.964,
+    "SevereAnemiaRBC":9.55,
+    "PolycythemiaRBC":11.55,
+    "UL95CI_MaleWBC": [5.85, 5.29],
+    "UL95CI_MaleHGB": [13.67, 12.37],
+    },
+        { 
+        "time": "2024-02", 
+        "Age":32,
+        "sex":"female",
+        "FemaleWBC": 4.95,
+        "FemaleHGB": 9, 
+        "NormalRBC": 4.05, 
+        "MildAnemiaRBC": 5.85, 
+        "ModerateAnemiaRBC": 8.55,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_FemaleWBC": [5.2, 4.7],
+        "UL95CI_FemaleHGB": [9.45, 8.55]
+        },
+        { 
+        "time": "2024-03", 
+        "Age":32,
+        "sex":"female",
+        "FemaleWBC": 4.46,
+        "FemaleHGB": 8.1, 
+        "NormalRBC": 3.645, 
+        "MildAnemiaRBC": 5.265, 
+        "ModerateAnemiaRBC": 7.695,
+        "SevereAnemiaRBC":8.55,
+        "PolycythemiaRBC":10.55,
+        "UL95CI_FemaleWBC": [4.68, 4.23],
+        "UL95CI_FemaleHGB": [8.51, 7.7]
+        
+        },
+        { 
+        "time": "2024-04", 
+        "Age":32,
+        "sex":"female",
+        "FemaleWBC": 5.129,
+        "FemaleHGB": 9.315, 
+        "NormalRBC": 4.1925, 
+        "MildAnemiaRBC": 6.1275, 
+        "ModerateAnemiaRBC": 8.9325,
+        "SevereAnemiaRBC":7.55,
+        "PolycythemiaRBC":9.55,
+        "UL95CI_FemaleWBC": [5.39, 4.87],
+        "UL95CI_FemaleHGB": [9.78, 8.85]
+        
+        },
+        { 
+        "time": "2024-05", 
+        "Age":32,
+        "sex":"female",
+        "FemaleWBC": 4.616,
+        "FemaleHGB": 8.38, 
+        "NormalRBC": 3.773, 
+        "MildAnemiaRBC": 5.542, 
+        "ModerateAnemiaRBC": 8.06,
+        "SevereAnemiaRBC":6.55,
+        "PolycythemiaRBC":8.55,
+        "UL95CI_FemaleWBC": [4.85, 4.39],
+        "UL95CI_FemaleHGB": [8.8, 7.96]
+        },
+        { 
+        "time": "2024-06", 
+        "Age":32,
+        "sex":"female",
+        "FemaleWBC": 5.7845,  
+        "FemaleHGB": 9.64, 
+        "NormalRBC": 4.338, 
+        "MildAnemiaRBC": 6.373, 
+        "ModerateAnemiaRBC": 9.28,
+        "SevereAnemiaRBC":5.55,
+        "PolycythemiaRBC":7.55,
+        "UL95CI_FemaleWBC": [6.07, 5.5],
+        "UL95CI_FemaleHGB": [10.12, 9.16]
+        },
+        { 
+        "time": "2024-07", 
+        "Age":32,
+        "sex":"female",
+        "FemaleWBC": 4.777,
+        "FemaleHGB": 8.676, 
+        "NormalRBC": 3.904, 
+        "MildAnemiaRBC": 5.736, 
+        "ModerateAnemiaRBC": 8.36,
+        "SevereAnemiaRBC":4.55,
+        "PolycythemiaRBC":6.55,
+        "UL95CI_FemaleWBC": [5.02, 4.54],
+        "UL95CI_FemaleHGB": [9.11, 8.24]
+        },
+        { 
+        "time": "2024-08", 
+        "Age":32,
+        "sex":"female",
+        "FemaleWBC": 5.493,
+        "FemaleHGB": 9.977, 
+        "NormalRBC": 4.49, 
+        "MildAnemiaRBC": 6.6, 
+        "ModerateAnemiaRBC": 9.6,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_FemaleWBC": [5.77, 5.22],
+        "UL95CI_FemaleHGB": [10.48, 9.48]
+        },
+        { 
+        "time": "2024-09", 
+        "Age":32,
+        "sex":"female",
+        "FemaleWBC": 5.387,
+        "FemaleHGB": 8.979, 
+        "NormalRBC": 4.041, 
+        "MildAnemiaRBC": 5.94, 
+        "ModerateAnemiaRBC": 8.64,
+        "SevereAnemiaRBC":10.55,
+        "PolycythemiaRBC":12.55,
+        "UL95CI_FemaleWBC": [5.66, 5.11],
+        "UL95CI_FemaleHGB": [9.43, 8.53]
+        },
+        { 
+        "time": "2024-10", 
+        "Age":32,
+        "sex":"female",
+        "FemaleWBC": 5.685,
+        "FemaleHGB": 10.33, 
+        "NormalRBC": 4.647, 
+        "MildAnemiaRBC": 6.837, 
+        "ModerateAnemiaRBC": 9.945,
+        "SevereAnemiaRBC":11.55,
+        "PolycythemiaRBC":13.55,
+        "UL95CI_FemaleWBC": [5.97, 5.4],
+        "UL95CI_FemaleHGB": [10.85, 9.81]
+        },
+        { 
+        "time": "2024-11", 
+        "Age":32,
+        "sex":"female",
+        "FemaleWBC": 5.116,
+        "FemaleHGB": 9.297, 
+        "NormalRBC": 4.182, 
+        "MildAnemiaRBC": 6.156, 
+        "ModerateAnemiaRBC": 8.964,
+        "SevereAnemiaRBC":9.55,
+        "PolycythemiaRBC":11.55,
+        "UL95CI_FemaleWBC": [5.37, 4.86],
+        "UL95CI_FemaleHGB": [9.76, 8.83]
+        },
 ];
 
 const ControlAndDisplay: React.FC = () => {
@@ -371,7 +1129,7 @@ const ControlAndDisplay: React.FC = () => {
         ageopen:false,
         agevalue:"Minor(<18)",
         sexopen: false,
-        sexvalue: "female",
+        sexvalue: "all",
         BMIopen: false,
         BMIvalue: "",
         Ethnicityopen: false,
@@ -387,48 +1145,104 @@ const ControlAndDisplay: React.FC = () => {
     // const [filteredData, setFilteredData] = useState(initialDummyData);
     
    
-    const { MonthPicker} = DatePicker;
     const monthFormat = 'YYYY/MM';
-    const [fromDate, setFromDate] = useState("2024/01");
-    const [toDate, setToDate] = useState("2024/10");
-  
+    const [fromDate, setFromDate] = useState(moment("2024/01", monthFormat).toDate());
+    const [toDate, setToDate] = useState(moment("2024/10", monthFormat).toDate());
+
     const filteredData = useMemo(() => {
-        if (fromDate && toDate) {
-            let dateFiltered = initialDummyData.filter((d) =>
-                isWithinInterval(new Date(d.time), {
-                    start: moment(fromDate, monthFormat).startOf('month').toDate(),
-                    end: moment(toDate, monthFormat).endOf('month').toDate(),
-                })
-            );
+        let filtered = initialDummyData;
     
-            // 年龄筛选
-            if (state.agevalue) {
-                const selectedAge = state.agevalue;
-                dateFiltered = dateFiltered.filter((data) => {
-                    const age = data.Age;
-                    if (selectedAge === "Minor(<18)" && age < 18) {
-                        return true;
-                    } else if (selectedAge === "Adults(18-65)" && age >= 18 && age <= 65) {
-                        return true;
-                    } else if (selectedAge === "Elderly(>65)" && age > 65) {
-                        return true;
-                    }
-                    return false;
+        // 日期筛选
+        if (fromDate || toDate) {
+            filtered = filtered.filter((d) => {
+                const date = new Date(d.time);
+        
+                if (fromDate && !toDate) {
+                    // Only fromDate is provided, filter dates after or on fromDate
+                    return date >= moment(fromDate).startOf('month').toDate();
+                }
+        
+                if (!fromDate && toDate) {
+                    // Only toDate is provided, filter dates before or on toDate
+                    return date <= moment(toDate).endOf('month').toDate();
+                }
+        
+                // Both fromDate and toDate are provided, filter within range
+                return isWithinInterval(date, {
+                    start: moment(fromDate).startOf('month').toDate(),
+                    end: moment(toDate).endOf('month').toDate(),
                 });
-            }
-    
-            // 性别筛选
-            if (state.sexvalue) {
-                const selectedSex = state.sexvalue;
-                dateFiltered = dateFiltered.filter((data) => data.sex === selectedSex);
-            }
-    
-            return dateFiltered;
+            });
         }
-        return initialDummyData;
+
+        // 年龄筛选
+        if (state.agevalue) {
+            const selectedAge = state.agevalue;
+    
+            filtered = filtered.filter((data) => {
+                const age = data.Age;
+                if (selectedAge === "Minor(<18)" && age < 18) {
+                    return true;
+                } else if (selectedAge === "Adults(18-65)" && age >= 18 && age <= 65) {
+                    return true;
+                } else if (selectedAge === "Elderly(>65)" && age > 65) {
+                    return true;
+                }
+                return false;
+            });
+        }
+    
+        // 性别筛选
+        if (state.sexvalue) {
+            const selectedSex = state.sexvalue;
+            filtered = filtered.filter((data) => data.sex === selectedSex);
+        }
+    
+        return filtered;
     }, [fromDate, toDate, initialDummyData, state.agevalue, state.sexvalue]);
     
     
+    const SelectPopover = ({ open, onOpenChange, value, onSelect, options, placeholder, noOptionsText }) => (
+        <Popover open={open} onOpenChange={onOpenChange}>
+            <PopoverTrigger asChild>
+                <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="h-9 px-4 py-2 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                    {value ? options.find(option => option.value === value)?.label : placeholder}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[auto] p-0">
+                <Command>
+                    <CommandList>
+                        <CommandEmpty>{noOptionsText}</CommandEmpty>
+                        <CommandGroup>
+                            {options.map(option => (
+                                <CommandItem
+                                    key={option.value}
+                                    value={option.value}
+                                    onSelect={currentValue => {
+                                        onSelect( currentValue);
+                                    }}
+                                >
+                                    <Check
+                                        className={cn(
+                                            "mr-2 h-4 w-4",
+                                            value === option.value ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                    {option.label}
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    );
 
     // const handleFilterApply = () => {
     //     const newFilter = `Sex: ${sex}`;
@@ -468,235 +1282,81 @@ const ControlAndDisplay: React.FC = () => {
                     md:flex-row: 从中等屏幕 (md) 起，布局方向改为行方向，使子项水平排列。这个类会覆盖 flex-col 布局，使子项在中等及更大屏幕上水平排列。
                     md:space-y-0: 从中等屏幕 (md) 起，移除垂直间距。因为在行布局中不需要垂直间距，所以需要设置为 0。
                     md:space-x-4: 从中等屏幕 (md) 起，添加水平间距。4 代表一个特定的间距单位（通常是 1rem 或 16px），在行布局中，子项之间会有水平的空隙。 */}
-                   {/**Age */}
-                   <Popover open={state.ageopen} onOpenChange={(open) => setState(prev => ({ ...prev, ageopen: open }))}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    role="combobox"
-                                    aria-expanded={state.ageopen}
-                                    className="w-[220px] justify-between "
-                                >
-                                    {state.agevalue
-                                        ? Ages.find((age) => age.value === state.agevalue)?.label
-                                        : "Select age"}
-                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-[220px] p-0">
-                                <Command>
-                                    <CommandList>
-                                        <CommandEmpty>No age found.</CommandEmpty>
-                                        <CommandGroup>
-                                            {Ages.map((age) => (
-                                                <CommandItem
-                                                    key={age.value}
-                                                    value={age.value}
-                                                    onSelect={(currentValue) => {
-                                                        setState(prev => ({
-                                                            ...prev,
-                                                            agevalue: currentValue === state.agevalue ? "" : currentValue,
-                                                            ageopen: false
-                                                        }));
-                                                    }}
-                                                >
-                                                    <Check
-                                                        className={cn(
-                                                            "mr-2 h-4 w-4",
-                                                            state.agevalue === age.value ? "opacity-100" : "opacity-0"
-                                                        )}
-                                                    />
-                                                    {age.label}
-                                                </CommandItem>
-                                            ))}
-                                        </CommandGroup>
-                                    </CommandList>
-                                </Command>
-                            </PopoverContent>
-                        </Popover>
+                        <SelectPopover 
+                            open={state.ageopen} 
+                            onOpenChange={open => setState(prev => ({ ...prev, ageopen: open }))}
+                            value={state.agevalue}
+                            onSelect={newValue => setState(prev => ({ ...prev, agevalue: newValue, ageopen: false }))}
+                            options={Ages}
+                            placeholder="Select age"
+                            noOptionsText="No age found."
+                        />
 
-                    {/** Select Sex */}
-                    <Popover open={state.sexopen} onOpenChange={(open) => setState(prev => ({ ...prev, sexopen: open }))}>
-                        <PopoverTrigger asChild>
-                            <Button
-                                variant="outline"
-                                role="combobox"
-                                aria-expanded={state.sexopen}
-                                className="w-[220px] justify-between"
-                            >
-                                {state.sexvalue
-                                    ? sexs.find((sex) => sex.value === state.sexvalue)?.label
-                                    : "Select sex"}
-                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[220px] p-0">
-                            <Command>
-                                <CommandList>
-                                    <CommandEmpty>No sex found.</CommandEmpty>
-                                    <CommandGroup>
-                                        {sexs.map((sex) => (
-                                            <CommandItem
-                                                key={sex.value}
-                                                value={sex.value}
-                                                onSelect={(currentValue) => {
-                                                    setState(prev => ({
-                                                        ...prev,
-                                                        sexvalue: currentValue === state.sexvalue ? "" : currentValue,
-                                                        sexopen: false
-                                                    }));
-                                                }}
-                                            >
-                                                <Check
-                                                    className={cn(
-                                                        "mr-2 h-4 w-4",
-                                                        state.sexvalue === sex.value ? "opacity-100" : "opacity-0"
-                                                    )}
-                                                />
-                                                {sex.label}
-                                            </CommandItem>
-                                        ))}
-                                    </CommandGroup>
-                                </CommandList>
-                            </Command>
-                        </PopoverContent>
-                    </Popover>
+                        <SelectPopover 
+                            open={state.sexopen} 
+                            onOpenChange={open => setState(prev => ({ ...prev, sexopen: open }))}
+                            value={state.sexvalue}
+                            onSelect={newValue => setState(prev => ({ ...prev, sexvalue: newValue, sexopen: false }))}
+                            options={sexs}
+                            placeholder="Select sex"
+                            noOptionsText="No sex found."
+                        />
+
+                        <SelectPopover 
+                            open={state.BMIopen} 
+                            onOpenChange={open => setState(prev => ({ ...prev, BMIopen: open }))}
+                            value={state.BMIvalue}
+                            onSelect={newValue => setState(prev => ({ ...prev, BMIvalue: newValue, BMIopen: false }))}
+                            options={BMIs}
+                            placeholder="Select BMI"
+                            noOptionsText="No BMI found."
+                        />
+
+                        <SelectPopover 
+                            open={state.Ethnicityopen} 
+                            onOpenChange={open => setState(prev => ({ ...prev, Ethnicityopen: open }))}
+                            value={state.Ethnicityvalue}
+                            onSelect={newValue => setState(prev => ({ ...prev, Ethnicityvalue: newValue, Ethnicityopen: false }))}
+                            options={Ethnicitys}
+                            placeholder="Select Ethnicity"
+                            noOptionsText="No Ethnicity found."
+                        />
 
 
-                    {/** Select BMI */}
-                        <Popover //是一个包裹组件，它控制弹出框（或称下拉框）的打开和关闭状态。
-                        open={state.BMIopen} //根据状态来决定是否展示弹出框。
-                        onOpenChange={(open) => setState(prev => ({ ...prev, BMIopen: open }))}>{/* 当弹出框状态变化时更新状态。 */}
-                        <PopoverTrigger asChild>  
-                            <Button
-                            variant="outline" //定义按钮样式。
-                            role="combobox" //指定按钮的角色为下拉选择框。
-                            aria-expanded={state.BMIopen}
-                            className="w-[240px] justify-between"
-                            >
-                            {state.BMIvalue
-                                ? BMIs.find((bmi) => bmi.value === state.BMIvalue)?.label
-                                // 使用 find 方法在 BMIs 中查找满足条件的元素。条件是该元素的 value 属性与当前的 state.BMIvalue 相等。
-
-                                : "Select BMI"}
-                                {/* 如果当前有选择的 BMI，则显示其标签，否则显示默认的 "Select BMI"。 */}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />{/* 这是一个图标组件，表示上下双向的箭头。 */}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[auto] p-0">
-                            <Command>
-                            <CommandList>
-                                <CommandEmpty>No BMI found.</CommandEmpty>
-                                <CommandGroup>
-                                {BMIs.map((bmi) => (
-                                    <CommandItem
-                                    key={bmi.value}
-                                    value={bmi.value} //这是选项的值属性，用于标识该选项的具体值。
-                                    onSelect={(currentValue) => {//定义了一个在特定事件发生时执行的函数，该函数接收一个参数 currentValue，代表当前被选中的值。
-                                        setState(prev => ({
-                                        ...prev,
-                                        BMIvalue: currentValue === state.BMIvalue ? "" : currentValue,
-                                        //如果 currentValue 与当前状态中的 BMIvalue 相等，将 BMIvalue 设置为空字符串 ""；否则，将其设置为 currentValue。
-                                        BMIopen: false
-                                        }));
-                                    }}
-                                    //当用户选择某个选项时，调用 onSelect 回调更新状态。
-                                    >
-                                    <Check
-                                        className={cn(
-                                        "mr-2 h-4 w-4",
-                                        state.BMIvalue === bmi.value ? "opacity-100" : "opacity-0"
-                                        )}
-                                        //如果当前项被选中，图标的透明度为 100%；否则透明度为 0。
-                                    />
-                                    {bmi.label}
-                                    </CommandItem>
-                                ))}
-                                </CommandGroup>
-                            </CommandList>
-                            </Command>
-                        </PopoverContent>
-                        </Popover>
-
-                                            
-                    {/** Select Ethnicity */}
-                        <Popover 
-                        open={state.Ethnicityopen} 
-                        onOpenChange={(open) => setState(prev => ({ ...prev, Ethnicityopen: open }))}>
-                        <PopoverTrigger asChild>
-                            <Button
-                            variant="outline"
-                            role="combobox"
-                            aria-expanded={state.Ethnicityopen}
-                            className="w-[260px] justify-between"
-                            >
-                            {state.Ethnicityvalue
-                                ? Ethnicitys.find((Ethnicity) => Ethnicity.value === state.Ethnicityvalue)?.label
-                                : "Select Ethnicity"}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[auto] p-0">
-                            <Command>
-                            <CommandList>
-                                <CommandEmpty>No Ethnicity found.</CommandEmpty>
-                                <CommandGroup>
-                                {Ethnicitys.map((Ethnicity) => (
-                                    <CommandItem
-                                    key={Ethnicity.value}
-                                    value={Ethnicity.value}
-                                    onSelect={(currentValue) => {
-                                        setState(prev => ({
-                                        ...prev,
-                                        Ethnicityvalue: currentValue === state.Ethnicityvalue ? "" : currentValue,
-                                        Ethnicityopen: false
-                                        }));
-                                    }}
-                                    >
-                                    <Check
-                                        className={cn(
-                                        "mr-2 h-4 w-4",
-                                        state.Ethnicityvalue === Ethnicity.value ? "opacity-100" : "opacity-0"
-                                        )}
-                                    />
-                                    {Ethnicity.label}
-                                    </CommandItem>
-                                ))}
-                                </CommandGroup>
-                            </CommandList>
-                            </Command>
-                        </PopoverContent>
-                        </Popover>
-
-
-                       {/** Calendar Component */}
-                       <div className="flex space-x-4">
                             {/* From Month Picker */}
                             <div>
-                                <MonthPicker
-                                className="h-9 px-4 py-2"
-                                format={monthFormat}//monthFormat 是日期的格式，比如 YYYY-MM，表示年-月格式。这样确保选择器的输入和输出符合特定格式。
-                                placeholder="Pick a start month"//在选择器内显示占位符，提示用户选择开始月份。
-                                value={fromDate ? moment(fromDate, monthFormat) : null}//value 用于设置当前选择的值：
-                                //如果 fromDate 存在（即用户已选择开始月份），则将 fromDate 转换为 moment 对象（使用指定的 monthFormat），并作为选择器的当前值。
-                                //如果 fromDate 不存在，选择器的值为 null，即未选择状态。
-                                onChange={(date, dateString) => setFromDate(dateString as string)}
-                                //当用户选择了月份时，触发 onChange 事件：
-                                //dateString 是格式化后的日期字符串，将其传给 setFromDate，更新 fromDate 的状态。
+                                <DatePicker
+                                    className="h-9 px-4 py-2 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    selected={fromDate}
+                                    onChange={(date) => {
+                                        setFromDate(date);
+                                        if (toDate && date > toDate) {
+                                            setToDate(null);
+                                        }
+                                    }}
+                                    showMonthYearPicker
+                                    dateFormat="yyyy/MM"
+                                    placeholderText="Pick a start month"
                                 />
                             </div>
 
                             {/* To Month Picker */}
                             <div>
-                                <MonthPicker
-                                className="h-9 px-4 py-2"
-                                format={monthFormat}
-                                placeholder="Pick an end month"
-                                value={toDate ? moment(toDate, monthFormat) : null}
-                                onChange={(date,dateString) => setToDate(dateString as string)}
+                                <DatePicker
+                                    className="h-9 px-4  py-2 border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    selected={toDate}
+                                    onChange={(date) => {
+                                        setToDate(date);
+                                        if (fromDate && date < fromDate) {
+                                            setFromDate(null);
+                                        }
+                                    }}
+                                    showMonthYearPicker
+                                    dateFormat="yyyy/MM"
+                                    placeholderText="Pick an end month"
                                 />
                             </div>
-                            </div>
+                   
                             
                 </CardContent>
                 <CardFooter>
@@ -712,16 +1372,16 @@ const ControlAndDisplay: React.FC = () => {
                                     </button>
                                     </Badge>
                                 )}
-                        {state.sexvalue && (
-                            <Badge variant="outline" className="flex items-center w-[auto]">
-                            Sex: {sexs.find((sex) => sex.value === state.sexvalue)?.label}
-                            <button
-                                className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                onClick={() => setState(prev => ({ ...prev, sexvalue: "" }))}
-                            >
-                                X
-                            </button>
-                            </Badge>
+                       {state.sexvalue && state.sexvalue !== "all" && (
+                                <Badge variant="outline" className="flex items-center w-[auto]">
+                                    Sex: {sexs.find((sex) => sex.value === state.sexvalue)?.label}
+                                    <button
+                                    className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+                                    onClick={() => setState((prev) => ({ ...prev, sexvalue: "all" }))}
+                                    >
+                                    X
+                                    </button>
+                                </Badge>
                         )}
 
                         {/* 这是一个条件渲染语句。
@@ -752,12 +1412,12 @@ const ControlAndDisplay: React.FC = () => {
                             </button>
                             </Badge>
                         )}
-                        {fromDate && (
-                            <Badge variant="outline" className="flex items - center w - [auto]">
-                                FromDate: {fromDate}
+                         {fromDate && (
+                            <Badge variant="outline" className="flex items-center">
+                                From Date: {moment(fromDate).format(monthFormat)}
                                 <button
                                     className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                    onClick={() => setFromDate('')}
+                                    onClick={() => setFromDate(null)}
                                 >
                                     X
                                 </button>
@@ -765,11 +1425,11 @@ const ControlAndDisplay: React.FC = () => {
                         )}
 
                         {toDate && (
-                            <Badge variant="outline" className="flex items - center w - [auto]">
-                                ToDate: {toDate}
+                            <Badge variant="outline" className="flex items-center">
+                                To Date: {moment(toDate).format(monthFormat)}
                                 <button
                                     className="ml-2 h-4 w-4 text-gray-500 hover:text-gray-700 focus:outline-none"
-                                    onClick={() => setToDate('')}
+                                    onClick={() => setToDate(null)}
                                 >
                                     X
                                 </button>
@@ -841,12 +1501,12 @@ const ControlAndDisplay: React.FC = () => {
                     
 
                     {/*  Chart */}
-                    <Card className="w-[auto] h-[auto]">
-                        <CardHeader>
-                            <CardTitle>Chart</CardTitle>
-                            <CardDescription>This is chart</CardDescription>
+                    <Card className="chart-card">
+                        <CardHeader className="card-header">
+                            <CardTitle className="card-title">Chart</CardTitle>
+                            <CardDescription className="card-description">This is chart</CardDescription>
                         </CardHeader>
-                        <CardContent >
+                        <CardContent className="p-4 bg-white rounded-b-lg" >
                                 <RadioGroup  
                                 //用于提供指标的选择，用户可以选择 WBC（白细胞）、HGB（血红蛋白）、或 RBC（红细胞计数）。
                                 className="flex space-x-2"
@@ -868,7 +1528,7 @@ const ControlAndDisplay: React.FC = () => {
                                     <Label htmlFor="RBC">RBC</Label>
                                 </div>
                                 </RadioGroup>
-                            <ChartContainer config={chartConfig} className="h-[400px] w-full">
+                            <ChartContainer config={chartConfig} className="chart-container">
                                 {/** Chart Component */}
                                 <ComposedChart
                                     width={500}
@@ -883,7 +1543,16 @@ const ControlAndDisplay: React.FC = () => {
                                     >
                                 <CartesianGrid strokeDasharray="3 3" />
                                 {/* 绘制图表的网格线，strokeDasharray="3 3" 表示网格线为虚线。 */}
-                                <XAxis dataKey="time" />
+                                <XAxis 
+                                    dataKey="time"
+                                    tickFormatter={(time, index) => {
+                                        // 检查当前日期是否和前一个日期重复，若重复，则不显示
+                                        if (index === 0 || time !== filteredData[index - 1].time) {
+                                            return time; // 显示日期
+                                        }
+                                        return ""; // 重复时不显示刻度
+                                    }}
+                                />
                                 {/* 设置 X 轴，dataKey="time" 表示 X 轴的数据来自数据源中的 time 字段。 */}
                                 <YAxis label={{ value: selectedMetric, angle: -90, position: 'insideLeft', textAnchor: 'middle' }} domain={['auto', 'auto']}/>
                                 {/* 设置 Y 轴，label 属性用于设置 Y 轴的标签，selectedMetric 动态指定标签内容。domain={['auto', 'auto']} 使 Y 轴的范围自动调整。 */}
@@ -925,7 +1594,6 @@ const ControlAndDisplay: React.FC = () => {
                 </CardContent>
             </Card>
 
-            
         </Box>
     );
 };
