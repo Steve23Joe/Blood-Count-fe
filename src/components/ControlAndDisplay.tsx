@@ -4,7 +4,7 @@ import { Box, Grid, TextField,  Chip, FormControl, InputLabel, Select, MenuItem,
 import TuneIcon from '@mui/icons-material/Tune';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,  Legend,Area,AreaChart,ComposedChart, DefaultLegendContent,
-    ResponsiveContainer, } from 'recharts';
+    ResponsiveContainer,BarChart, Bar, Rectangle, } from 'recharts';
 import { Card,CardContent, CardDescription,CardFooter,CardHeader,CardTitle,} from "@/components/ui/card"
 import { ChartConfig, ChartContainer,ChartTooltip, ChartTooltipContent,ChartLegend, ChartLegendContent} from "@/components/ui/chart"
 import { Label } from "@/components/ui/label"
@@ -16,7 +16,7 @@ import { addDays, format, isWithinInterval } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import './style.css'; // 根据你的项目结构调整路径
+import './style.css'; 
 import moment from 'moment';
 import { Calendar } from "@/components/ui/calendar"
 import { Badge } from "@/components/ui/badge"
@@ -1535,27 +1535,27 @@ const ControlAndDisplay: React.FC = () => {
                                         Area 元素绘制填充区域，Line 元素绘制线条，分别用不同颜色表示不同的数据。 */}
                                         <Area  dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
                                         <Line  dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
-                                        <Area  dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#8884d8"/>
+                                        <Area  dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#FF6A6A"/>
                                         <Line  dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
                                       </>
                                     )}
                                      {selectedMetric === "HGB" && (
                                         <>
                                         {/* 如果 selectedMetric 为 "HGB"，图表内容与 WBC 类似，但显示的是血红蛋白数据。 */}
-                                        <Area  dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
+                                        <Bar  dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
                                         <Line  dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
-                                        <Area  dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#8884d8"/>
+                                        <Bar  dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#FF6A6A"/>
                                         <Line  dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
                                         </>
                                     )}
                                     {selectedMetric === "RBC" && (
                                         <>
                                         {/* 如果 selectedMetric 为 "RBC"，图表显示多条线条，分别表示正常和不同程度贫血等情况。 */}
-                                        <Line  dataKey={`Normal${selectedMetric}`} stroke="#228B22" />
-                                        <Line  dataKey={`MildAnemia${selectedMetric}`} stroke="#EEEE00" />
-                                        <Line  dataKey={`ModerateAnemia${selectedMetric}`} stroke="#EE7942" />
-                                        <Line  dataKey={`SevereAnemia${selectedMetric}`} stroke="#FF0000" />
-                                        <Line  dataKey={`Polycythemia${selectedMetric}`} stroke="#8A2BE2" />
+                                        <Bar  dataKey={`Normal${selectedMetric}`} fill="#228B22" />
+                                        <Bar  dataKey={`MildAnemia${selectedMetric}`} fill="#EEEE00" />
+                                        <Bar  dataKey={`ModerateAnemia${selectedMetric}`} fill="#EE7942" />
+                                        <Bar  dataKey={`SevereAnemia${selectedMetric}`} fill="#FF0000" />
+                                        <Bar  dataKey={`Polycythemia${selectedMetric}`} fill="#8A2BE2" />
                                         </>
                                     )}
                                     </ComposedChart>
