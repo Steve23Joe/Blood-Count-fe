@@ -562,7 +562,9 @@ const ControlAndDisplay: React.FC = () => {
                                     </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {updatedDiagnosis.map((diagnosi) => (
+                                    {updatedDiagnosis
+                                        .sort((a, b) => b.count - a.count) // 按 count 降序排序
+                                        .map((diagnosi) => (
                                             <TableRow key={diagnosi.diagnosis} className="hover:bg-gray-50">
                                                 <TableCell className="flex items-center space-x-2 pl-4 py-4"> 
                                                     <Badge  
@@ -591,7 +593,8 @@ const ControlAndDisplay: React.FC = () => {
                                                 </TableCell>
                                             </TableRow>
                                         ))}
-                                    </TableBody>
+                                </TableBody>
+
 
 
                                 </Table>
