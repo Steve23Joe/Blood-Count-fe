@@ -18,6 +18,8 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import './style.css'; 
 import moment from 'moment';
+import ReactDOM from 'react-dom';
+import { Formik, Field, Form } from 'formik';
 import { Calendar } from "@/components/ui/calendar"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -186,9 +188,6 @@ const sexs = [
   
 
 const ControlAndDisplay: React.FC = () => {
-
-       
-   
     const [initialDummyData, setInitialDummyData] = useState([]);
 
     useEffect(() => {
@@ -486,8 +485,6 @@ const ControlAndDisplay: React.FC = () => {
                                     placeholderText="Pick an end month"
                                 />
                             </div>
-                   
-                            
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
                 Chips:<u></u>
@@ -594,9 +591,6 @@ const ControlAndDisplay: React.FC = () => {
                                             </TableRow>
                                         ))}
                                 </TableBody>
-
-
-
                                 </Table>
                             </CardContent>
                     </Card>
@@ -609,27 +603,43 @@ const ControlAndDisplay: React.FC = () => {
                             <CardDescription className="card-description">This is chart</CardDescription>
                         </CardHeader>
                         <CardContent className="p-4 bg-white rounded-b-lg" >
-                                <RadioGroup  
-                                //用于提供指标的选择，用户可以选择 WBC（白细胞）、HGB（血红蛋白）、或 RBC（红细胞计数）。
-                                className="flex space-x-2"
-                                aria-label="metric"
-                                name="metric"
-                                value={selectedMetric} //当前选中的指标值，如 "WBC"、"HGB" 或 "RBC"。
-                                onValueChange={handleMetricChange} //当用户选择不同的指标时，调用 handleMetricChange 函数更新 selectedMetric 的值。
-                                > 
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="WBC" id="option-one" />
-                                    <Label htmlFor="WBC">WBC</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="HGB" id="option-two" />
-                                    <Label htmlFor="HGB">HGB</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="RBC" id="option-three" />
-                                    <Label htmlFor="RBC">RBC</Label>
-                                </div>
-                                </RadioGroup>
+                        <div>
+                            <Formik
+                                initialValues={{
+                                metric: selectedMetric, 
+                                }}
+                                onSubmit={async (values) => {
+                                await new Promise((r) => setTimeout(r, 500));
+                                alert(JSON.stringify(values, null, 2));
+                                handleMetricChange(values.metric);
+                                }}
+                            >
+                                {({ values }) => (
+                                <Form>
+                                    <div role="group" aria-labelledby="my-radio-group" className="flex space-x-2">
+                                    <div className="flex items-center space-x-2">
+                                        <Field type="radio" name="metric" value="WBC" id="option-one" />
+                                        <label htmlFor="option-one">WBC</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <Field type="radio" name="metric" value="HGB" id="option-two" />
+                                        <label htmlFor="option-two">HGB</label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <Field type="radio" name="metric" value="RBC" id="option-three" />
+                                        <label htmlFor="option-three">RBC</label>
+                                    </div>
+                                    <button type="submit" className="submit-btn">Submit</button>
+                                    </div>
+                                </Form>
+                                )}
+                            </Formik>
+
+                            {/* Display the selected metric after form submission */}
+                            <div className="mt-4">
+                                <strong>Currently Selected Metric:</strong> {selectedMetric}
+                            </div>
+                            </div>
                             <ChartContainer config={chartConfig} className="chart-container">
                                 {/** Chart Component */}
                                 <ComposedChart

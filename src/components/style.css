@@ -104,3 +104,26 @@
     border-radius: 0.25rem; /* Rounded corners */
     padding: 0.5rem; /* Padding */
 }
+/* 在 style.css 文件中添加 */
+.submit-btn {
+    padding: 5px 10px;
+    border: 2px solid black;  /* 黑色边框 */
+    background-color: white;  /* 白色背景 */
+    color: black;  /* 黑色文字 */
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;  /* 圆角 */
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;  /* 过渡效果 */
+}
+
+/* 鼠标悬停时 */
+.submit-btn:hover {
+    background-color: black;  /* 背景变为黑色 */
+    color: white;  /* 文字变为白色 */
+}
+
+/* 鼠标点击时 */
+.submit-btn:active {
+    background-color: grey;  /* 背景变为灰色 */
+    border-color: darkgrey;  /* 边框变为深灰色 */
+}
