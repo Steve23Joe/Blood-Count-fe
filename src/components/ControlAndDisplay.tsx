@@ -16,7 +16,7 @@ import { addDays, format, isWithinInterval } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import './style.css'; 
+
 import moment from 'moment';
 import ReactDOM from 'react-dom';
 import { Formik, Field, Form } from 'formik';
@@ -60,7 +60,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Close } from '@radix-ui/react-dialog';
-
+import ReactEcharts from 'echarts-for-react';
+import * as d3 from 'd3-geo';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
+// Initialize the map module
+import topology from './world.json'; // Import your local GeoJSON data
+import map from 'highcharts/modules/map'; // 导入地图模块
+map(Highcharts); // 注册地图模块
 
 const Ages = [
     {
@@ -190,6 +197,49 @@ const sexs = [
 const ControlAndDisplay: React.FC = () => {
     const [initialDummyData, setInitialDummyData] = useState([]);
 
+    const data = [
+                ['fo', 10], ['um', 11], ['us', 12], ['jp', 13], ['sc', 14], ['fr', 15],
+                ['fm', 16], ['cn', 17], ['pt', 18], ['sw', 19], ['sh', 20], ['br', 21],
+                ['ki', 22], ['ph', 23], ['mx', 24], ['bu', 25], ['mv', 26], ['sp', 27],
+                ['gb', 28], ['gr', 29], ['as', 30], ['dk', 31], ['gl', 32], ['gu', 33],
+                ['mp', 34], ['pr', 35], ['vi', 36], ['ca', 37], ['st', 38], ['cv', 39],
+                ['dm', 40], ['nl', 41], ['jm', 42], ['ws', 43], ['om', 44], ['vc', 45],
+                ['tr', 46], ['bd', 47], ['lc', 48], ['nr', 49], ['no', 50], ['kn', 51],
+                ['bh', 52], ['to', 53], ['fi', 54], ['id', 55], ['mu', 56], ['se', 57],
+                ['tt', 58], ['my', 59], ['pa', 60], ['pw', 61], ['tv', 62], ['mh', 63],
+                ['th', 64], ['gd', 65], ['ee', 66], ['ag', 67], ['tw', 68], ['bb', 69],
+                ['it', 70], ['mt', 71], ['vu', 72], ['sg', 73], ['cy', 74], ['lk', 75],
+                ['km', 76], ['fj', 77], ['ru', 78], ['va', 79], ['sm', 80], ['kz', 81],
+                ['az', 82], ['am', 83], ['tj', 84], ['ls', 85], ['uz', 86], ['in', 87],
+                ['es', 88], ['ma', 89], ['ec', 90], ['co', 91], ['tl', 92], ['tz', 93],
+                ['ar', 94], ['sa', 95], ['pk', 96], ['ye', 97], ['ae', 98], ['ke', 99],
+                ['pe', 100], ['do', 101], ['ht', 102], ['ao', 103], ['kh', 104],
+                ['vn', 105], ['mz', 106], ['cr', 107], ['bj', 108], ['ng', 109],
+                ['ir', 110], ['sv', 111], ['cl', 112], ['sl', 113], ['gw', 114],
+                ['hr', 115], ['bz', 116], ['za', 117], ['cf', 118], ['sd', 119],
+                ['ly', 120], ['cd', 121], ['kw', 122], ['pg', 123], ['de', 124],
+                ['ch', 125], ['er', 126], ['ie', 127], ['kp', 128], ['kr', 129],
+                ['gy', 130], ['hn', 131], ['mm', 132], ['ga', 133], ['gq', 134],
+                ['ni', 135], ['lv', 136], ['ug', 137], ['mw', 138], ['sx', 139],
+                ['tm', 140], ['zm', 141], ['nc', 142], ['mr', 143], ['dz', 144],
+                ['lt', 145], ['et', 146], ['gh', 147], ['si', 148], ['gt', 149],
+                ['ba', 150], ['jo', 151], ['sy', 152], ['mc', 153], ['al', 154],
+                ['uy', 155], ['cnm', 156], ['mn', 157], ['rw', 158], ['so', 159],
+                ['bo', 160], ['cm', 161], ['cg', 162], ['eh', 163], ['rs', 164],
+                ['me', 165], ['tg', 166], ['la', 167], ['af', 168], ['ua', 169],
+                ['sk', 170], ['jk', 171], ['bg', 172], ['ro', 173], ['qa', 174],
+                ['li', 175], ['at', 176], ['sz', 177], ['hu', 178], ['ne', 179],
+                ['lu', 180], ['ad', 181], ['ci', 182], ['lr', 183], ['bn', 184],
+                ['be', 185], ['iq', 186], ['ge', 187], ['gm', 188], ['td', 189],
+                ['kv', 190], ['lb', 191], ['dj', 192], ['bi', 193], ['sr', 194],
+                ['il', 195], ['ml', 196], ['sn', 197], ['gn', 198], ['zw', 199],
+                ['pl', 200], ['mk', 201], ['py', 202], ['by', 203], ['cz', 204],
+                ['bf', 205], ['na', 206], ['tn', 207], ['bt', 208], ['kg', 209],
+                ['md', 210], ['ss', 211], ['bw', 212], ['sb', 213], ['ve', 214],
+                ['nz', 215], ['cu', 216], ['au', 217], ['bs', 218], ['mg', 219],
+                ['is', 220], ['eg', 221], ['np', 222]
+            ];
+
     useEffect(() => {
         const fetchData = async () => {
           try {
@@ -222,10 +272,17 @@ const ControlAndDisplay: React.FC = () => {
  
 
     const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-    const [selectedMetric, setSelectedMetric] = useState('WBC');
+    const [selectedMetric, setSelectedMetric] = useState('RBC');
+    const [highlightedRBC, setHighlightedRBC] = useState(null); // 新增状态用于高亮显示的 RBC 状态
+    const [selectedDiagnosis, setSelectedDiagnosis] = useState(null);
     //const [sex] = useState('');
     // const [filteredData, setFilteredData] = useState(initialDummyData);
-    
+    const chartConfig = {}; // Chart 配置
+
+    const handleRowClick = (diagnosis) => {
+        setSelectedDiagnosis(diagnosis); // 更新选中的诊断方法
+        setHighlightedRBC(diagnosis); // 更新需要高亮显示的 RBC 状态
+    };
    
     const monthFormat = 'YYYY/MM';
     const [fromDate, setFromDate] = useState(moment("2024/01", monthFormat).toDate());
@@ -536,102 +593,99 @@ const ControlAndDisplay: React.FC = () => {
 
             {/* Bottom Section */}
            
-            <Card >
-                <CardHeader>
-                    <CardTitle >Trends</CardTitle>
-                    <CardDescription ></CardDescription>
+            <Card>
+            <CardHeader>
+                <CardTitle>Trends</CardTitle>
+                <CardDescription></CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+                {/* Left Side: Top 5 Diagnosis Methods */}
+                <Card className="w-[500px] h-[auto]">
+                    <CardHeader>
+                        <CardTitle>Top 5 Diagnosis Methods</CardTitle>
+                        <CardDescription>Card Description</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Table className="w-full">
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="font-semibold text-left pl-4">Diagnosis</TableHead>
+                                    <TableHead className="font-semibold text-right pr-4">Count</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {updatedDiagnosis
+                                    .sort((a, b) => b.count - a.count) // 按 count 降序排序
+                                    .map((diagnosi) => (
+                                        <TableRow 
+                                            key={diagnosi.diagnosis} 
+                                            className={`hover:bg-gray-50 ${selectedDiagnosis === diagnosi.diagnosis ? 'bg-blue-100' : ''}`} 
+                                            onClick={() => handleRowClick(diagnosi.diagnosis)} // 点击行时更新选中的诊断
+                                        >
+                                            <TableCell className="flex items-center space-x-2 pl-4 py-4"> 
+                                                <Badge  
+                                                    style={{ backgroundColor: getBadgeColor(diagnosi.diagnosis) }}
+                                                />
+                                                <span className="font-medium">{diagnosi.diagnosis}</span>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger>...</AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>This is {diagnosi.diagnosis}'s diagnosis.</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                This is {diagnosi.diagnosis}'s diagnosis.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </TableCell>
+                                            <TableCell className="text-right pr-4 py-4 font-medium"> 
+                                                {Math.floor(diagnosi.count)} {/* 将 count 转为整数 */}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
 
-                </CardHeader>
-                <CardContent className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
-                    {/* Left Side: Top 5 Diagnosis Methods */}
-                    <Card className="w-[500px] h-[auto]">
-                        <CardHeader>
-                            <CardTitle>Top 5 Diagnosis Methods</CardTitle>
-                            <CardDescription>Card Description</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                                <Table className="w-full">
-                                    <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="font-semibold text-left pl-4">Diagnosis</TableHead>
-                                        <TableHead className="font-semibold text-right pr-4">Count</TableHead>
-                                        {/* 表头部分，定义了 "Diagnosis"（诊断名称）和 "Count"（计数）两列，分别显示诊断方法及其对应的计数。 */}
-                                    </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                    {updatedDiagnosis
-                                        .sort((a, b) => b.count - a.count) // 按 count 降序排序
-                                        .map((diagnosi) => (
-                                            <TableRow key={diagnosi.diagnosis} className="hover:bg-gray-50">
-                                                <TableCell className="flex items-center space-x-2 pl-4 py-4"> 
-                                                    <Badge  
-                                                        style={{       
-                                                            backgroundColor: getBadgeColor(diagnosi.diagnosis), 
-                                                        }}
-                                                    />
-                                                    <span className="font-medium">{diagnosi.diagnosis}</span>
-                                                    <AlertDialog>
-                                                        <AlertDialogTrigger>...</AlertDialogTrigger>
-                                                        <AlertDialogContent>
-                                                            <AlertDialogHeader>
-                                                                <AlertDialogTitle>This is {diagnosi.diagnosis}'s diagnosis.</AlertDialogTitle>
-                                                                <AlertDialogDescription>
-                                                                    This is {diagnosi.diagnosis}'s diagnosis.
-                                                                </AlertDialogDescription>
-                                                            </AlertDialogHeader>
-                                                            <AlertDialogFooter>
-                                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                            </AlertDialogFooter>
-                                                        </AlertDialogContent>
-                                                    </AlertDialog>
-                                                </TableCell>
-                                                <TableCell className="text-right pr-4 py-4 font-medium"> 
-                                                    {Math.floor(diagnosi.count)} {/* 将 count 转为整数 */}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                </TableBody>
-                                </Table>
-                            </CardContent>
-                    </Card>
-                    
-
-                    {/*  Chart */}
-                    <Card className="chart-card">
-                        <CardHeader className="card-header">
-                            <CardTitle className="card-title">Chart</CardTitle>
-                            <CardDescription className="card-description">This is chart</CardDescription>
-                        </CardHeader>
-                        <CardContent className="p-4 bg-white rounded-b-lg" >
+                {/* Chart */}
+                <Card className="border border-gray-300 rounded-lg shadow-md w-3/4 h-[auto]">
+                    <CardHeader className="bg-white p-4 rounded-t-lg shadow-sm">
+                        <CardTitle className="text-xl font-semibold text-gray-700">Chart</CardTitle>
+                        <CardDescription className="text-sm text-gray-500">This is chart</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-4 bg-white rounded-b-lg">
                         <div>
                             <Formik
-                                initialValues={{
-                                metric: selectedMetric, 
-                                }}
+                                initialValues={{ metric: selectedMetric }}
                                 onSubmit={async (values) => {
-                                await new Promise((r) => setTimeout(r, 500));
-                                alert(JSON.stringify(values, null, 2));
-                                handleMetricChange(values.metric);
+                                    await new Promise((r) => setTimeout(r, 500));
+                                    alert(JSON.stringify(values, null, 2));
+                                    setSelectedMetric(values.metric); // 更新选中的度量
                                 }}
                             >
                                 {({ values }) => (
-                                <Form>
-                                    <div role="group" aria-labelledby="my-radio-group" className="flex space-x-2">
-                                    <div className="flex items-center space-x-2">
-                                        <Field type="radio" name="metric" value="WBC" id="option-one" />
-                                        <label htmlFor="option-one">WBC</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Field type="radio" name="metric" value="HGB" id="option-two" />
-                                        <label htmlFor="option-two">HGB</label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Field type="radio" name="metric" value="RBC" id="option-three" />
-                                        <label htmlFor="option-three">RBC</label>
-                                    </div>
-                                    <button type="submit" className="submit-btn">Submit</button>
-                                    </div>
-                                </Form>
+                                    <Form>
+                                        <div role="group" aria-labelledby="my-radio-group" className="flex space-x-2">
+                                            <div className="flex items-center space-x-2">
+                                                <Field type="radio" name="metric" value="WBC" id="option-one" />
+                                                <label htmlFor="option-one">WBC</label>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <Field type="radio" name="metric" value="HGB" id="option-two" />
+                                                <label htmlFor="option-two">HGB</label>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <Field type="radio" name="metric" value="RBC" id="option-three" />
+                                                <label htmlFor="option-three">RBC</label>
+                                            </div>
+                                            <button type="submit" className="px-2 py-1 border-2 border-black bg-white text-black text-base rounded transition-colors duration-300 hover:bg-black hover:text-white active:bg-gray-500 active:border-gray-600">Submit</button>
+                                        </div>
+                                    </Form>
                                 )}
                             </Formik>
 
@@ -639,71 +693,166 @@ const ControlAndDisplay: React.FC = () => {
                             <div className="mt-4">
                                 <strong>Currently Selected Metric:</strong> {selectedMetric}
                             </div>
-                            </div>
-                            <ChartContainer config={chartConfig} className="chart-container">
-                                {/** Chart Component */}
-                                <ComposedChart
-                                    data={filteredData} //传入的数据源 filteredData，用于绘制图表。
-                                    margin={{
-                                        top: 10,
-                                        right: 30,
-                                        left: 30,
-                                        bottom: 0,
-                                    }}
-                                    >
+                        </div>
+                        <ChartContainer config={chartConfig} className="h-96 w-full bg-gray-100 rounded-lg shadow-md">
+                            <ComposedChart data={filteredData} margin={{ top: 10, right: 30, left: 30, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" />
-                                {/* 绘制图表的网格线，strokeDasharray="3 3" 表示网格线为虚线。 */}
-                                <XAxis 
-                                    dataKey="time"
-                                    tickFormatter={(time, index) => {
-                                        // 检查当前日期是否和前一个日期重复，若重复，则不显示
-                                        if (index === 0 || time !== filteredData[index - 1].time) {
-                                            return time; // 显示日期
-                                        }
-                                        return ""; // 重复时不显示刻度
-                                    }}
-                                />
-                                {/* 设置 X 轴，dataKey="time" 表示 X 轴的数据来自数据源中的 time 字段。 */}
-                                <YAxis label={{ value: selectedMetric, angle: -90, position: 'insideLeft', textAnchor: 'middle' }} domain={['auto', 'auto']}/>
-                                {/* 设置 Y 轴，label 属性用于设置 Y 轴的标签，selectedMetric 动态指定标签内容。domain={['auto', 'auto']} 使 Y 轴的范围自动调整。 */}
-                                <Tooltip  />
-                                <Legend  />
-                                    {selectedMetric === "WBC" && (
-                                        <>
-                                        {/* 如果 selectedMetric 为 "WBC"，则绘制表示男性和女性白细胞计数的数据。
-                                        Area 元素绘制填充区域，Line 元素绘制线条，分别用不同颜色表示不同的数据。 */}
-                                        <Area  dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
-                                        <Line  dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
-                                        <Area  dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#FF6A6A"/>
-                                        <Line  dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
-                                      </>
-                                    )}
-                                     {selectedMetric === "HGB" && (
-                                        <>
-                                        {/* 如果 selectedMetric 为 "HGB"，图表内容与 WBC 类似，但显示的是血红蛋白数据。 */}
-                                        <Bar  dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
-                                        <Line  dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
-                                        <Bar  dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#FF6A6A"/>
-                                        <Line  dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
-                                        </>
-                                    )}
-                                    {selectedMetric === "RBC" && (
-                                        <>
-                                        {/* 如果 selectedMetric 为 "RBC"，图表显示多条线条，分别表示正常和不同程度贫血等情况。 */}
-                                        <Bar  dataKey={`Normal${selectedMetric}`} fill="#228B22" />
-                                        <Bar  dataKey={`MildAnemia${selectedMetric}`} fill="#EEEE00" />
-                                        <Bar  dataKey={`ModerateAnemia${selectedMetric}`} fill="#EE7942" />
-                                        <Bar  dataKey={`SevereAnemia${selectedMetric}`} fill="#FF0000" />
-                                        <Bar  dataKey={`Polycythemia${selectedMetric}`} fill="#8A2BE2" />
-                                        </>
-                                    )}
-                                    </ComposedChart>
-                            </ChartContainer>
-                        </CardContent>
-                    </Card>
-                </CardContent>
-            </Card>
+                                <XAxis dataKey="time" />
+                                <YAxis label={{ value: selectedMetric, angle: -90, position: 'insideLeft', textAnchor: 'middle' }} domain={['auto', 'auto']} />
+                                <Tooltip />
+                                <Legend />
+                                {selectedMetric === "WBC" && (
+                                    <>
+                                        <Area dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
+                                        <Line dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
+                                        <Area dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#FF6A6A"/>
+                                        <Line dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
+                                    </>
+                                )}
+                                {selectedMetric === "HGB" && (
+                                    <>
+                                        <Bar dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
+                                        <Line dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
+                                        <Bar dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#FF6A6A"/>
+                                        <Line dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
+                                    </>
+                                )}
+                               {selectedMetric === "RBC" && (
+                                <>
+                                    <Bar 
+                                        dataKey={`Normal${selectedMetric}`} 
+                                        fill={highlightedRBC === 'Normal' ? "#FFB6C1" : "#228B22"} 
+                                        strokeWidth={highlightedRBC === 'Normal' ? 4 : 2} 
+                                        stroke={highlightedRBC === 'Normal' ? "#FF69B4" : "none"} // 突出颜色
+                                    />
+                                    <Bar 
+                                        dataKey={`MildAnemia${selectedMetric}`} 
+                                        fill={highlightedRBC === 'MildAnemia' ? "#FFB6C1" : "#EEEE00"} 
+                                        strokeWidth={highlightedRBC === 'MildAnemia' ? 4 : 2} 
+                                        stroke={highlightedRBC === 'MildAnemia' ? "#FF69B4" : "none"} // 突出颜色
+                                    />
+                                    <Bar 
+                                        dataKey={`ModerateAnemia${selectedMetric}`} 
+                                        fill={highlightedRBC === 'ModerateAnemia' ? "#FFB6C1" : "#EE7942"} 
+                                        strokeWidth={highlightedRBC === 'ModerateAnemia' ? 4 : 2} 
+                                        stroke={highlightedRBC === 'ModerateAnemia' ? "#FF69B4" : "none"} // 突出颜色
+                                    />
+                                    <Bar 
+                                        dataKey={`SevereAnemia${selectedMetric}`} 
+                                        fill={highlightedRBC === 'SevereAnemia' ? "#FFB6C1" : "#FF0000"} 
+                                        strokeWidth={highlightedRBC === 'SevereAnemia' ? 4 : 2} 
+                                        stroke={highlightedRBC === 'SevereAnemia' ? "#FF69B4" : "none"} // 突出颜色
+                                    />
+                                    <Bar 
+                                        dataKey={`Polycythemia${selectedMetric}`} 
+                                        fill={highlightedRBC === 'Polycythemia' ? "#FFB6C1" : "#8A2BE2"} 
+                                        strokeWidth={highlightedRBC === 'Polycythemia' ? 4 : 2} 
+                                        stroke={highlightedRBC === 'Polycythemia' ? "#FF69B4" : "none"} // 突出颜色
+                                    />
+                                </>
+                            )}
 
+   
+                            </ComposedChart>
+                        </ChartContainer>
+                    </CardContent>
+                </Card>
+            </CardContent>
+        </Card>
+
+            <Card>
+            <CardHeader>
+                <CardTitle>Card Title</CardTitle>
+                <CardDescription>Card Description</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+                <Card className="border border-gray-300 rounded-lg shadow-md w-3/4 h-[auto]">
+                    <CardHeader>
+                        <CardTitle>Card Title</CardTitle>
+                        <CardDescription>Card Description</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div style={{ width: '100%', height: '500px' }}>
+                            <HighchartsReact
+                                highcharts={Highcharts}
+                                constructorType={'mapChart'}
+                                options={{
+                                    chart: {
+                                        map: topology,
+                                        backgroundColor: '#f5f5f5',
+                                    },
+                                    title: {
+                                        text: 'Highcharts Maps Basic Demo',
+                                    },
+                                    subtitle: {
+                                        text: 'Source map: Local GeoJSON data',
+                                    },
+                                    mapNavigation: {
+                                        enabled: true,
+                                        buttonOptions: {
+                                            verticalAlign: 'bottom',
+                                        },
+                                    },
+                                    colorAxis: {
+                                        min: 0,
+                                        stops: [
+                                            [0, '#EFEFFF'],
+                                            [0.5, '#005B96'],
+                                            [1, '#003c68']
+                                        ],
+                                    },
+                                    series: [{
+                                        data: data,
+                                        name: 'Random data',
+                                        states: {
+                                            hover: {
+                                                color: '#BADA55',
+                                            },
+                                        },
+                                        dataLabels: {
+                                            enabled: true,
+                                            format: '{point.name}',
+                                        },
+                                    }],
+                                }}
+                            />
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card className="w-1/4 h-[auto]">
+                    <CardHeader>
+                        <CardTitle>Top 10 Countries</CardTitle>
+                        <CardDescription>Card Description</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Table className="w-full">
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="font-semibold text-left pl-4">Country Code</TableHead>
+                                    <TableHead className="font-semibold text-right pr-4">Count</TableHead>
+                                    {/* 表头部分，定义了 "Country Code"（国家代码）和 "Count"（计数）两列 */}
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {data
+                                    .sort((a, b) => b[1] - a[1]) // 按 count 降序排序
+                                    .slice(0, 10) // 只取前 10 个国家
+                                    .map(([countryCode, count]) => (
+                                        <TableRow key={countryCode} className="hover:bg-gray-50">
+                                            <TableCell className="flex items-center space-x-2 pl-4 py-4"> 
+                                                <span className="font-medium">{countryCode.toUpperCase()}</span> {/* 显示国家代码 */}
+                                            </TableCell>
+                                            <TableCell className="text-right pr-4 py-4 font-medium"> 
+                                                {count} {/* 显示计数 */}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </CardContent>
+            </Card>
         </Box>
     );
 };
