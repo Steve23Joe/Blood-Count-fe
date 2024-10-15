@@ -16,8 +16,10 @@ import { addDays, format, isWithinInterval } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import './style.css'; 
+
 import moment from 'moment';
+import ReactDOM from 'react-dom';
+import { Formik, Field, Form } from 'formik';
 import { Calendar } from "@/components/ui/calendar"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -58,7 +60,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Close } from '@radix-ui/react-dialog';
-
+import ReactEcharts from 'echarts-for-react';
+import * as d3 from 'd3-geo';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
+// Initialize the map module
+import topology from './world.json'; // Import your local GeoJSON data
+import map from 'highcharts/modules/map'; // 导入地图模块
+map(Highcharts); // 注册地图模块
 
 const Ages = [
     {
@@ -81,15 +90,15 @@ const diagnosis = [
         "count": "1250",
     },
     {
-        "diagnosis":"Mild Anemia",
+        "diagnosis":"MildAnemia",
         "count":"450"
     },
     {
-        "diagnosis":"Moderate Anemia",
+        "diagnosis":"ModerateAnemia",
         "count":"200"
     },
     {
-        "diagnosis":"Severe Anemia",
+        "diagnosis":"SevereAnemia",
         "count":"80"
     },
     {
@@ -169,11 +178,11 @@ const sexs = [
     switch(diagnosis) {
       case 'Normal':
         return '#228B22'; 
-      case 'Mild Anemia':
+      case 'MildAnemia':
         return '#EEEE00'; 
-      case 'Moderate Anemia':
+      case 'ModerateAnemia':
         return '#EE7942'; 
-      case 'Severe Anemia':
+      case 'SevereAnemia':
         return '#FF0000'; 
       case 'Polycythemia':
         return '#8A2BE2'; 
@@ -183,946 +192,70 @@ const sexs = [
   };
 
   
-  const initialDummyData = [
-{ 
-"time": "2024-01", 
-"Age":12,
-"sex":"all",
-"MaleWBC": 5.4,  
-"FemaleWBC": 4.95,
-"MaleHGB": 12.6, 
-"FemaleHGB": 9, 
-"NormalRBC": 4.05, 
-"MildAnemiaRBC": 5.85, 
-"ModerateAnemiaRBC": 8.55,
-"SevereAnemiaRBC":9.55,
-"PolycythemiaRBC":11.55,
-"UL95CI_MaleWBC": [5.67, 5.13],
-"UL95CI_FemaleWBC": [5.2, 4.7],
-"UL95CI_MaleHGB": [13.23, 11.97],
-"UL95CI_FemaleHGB": [9.45, 8.55]
-},
-{ 
-"time": "2024-02", 
-"Age":12,
-"sex":"all",
-"MaleWBC": 4.86,  
-"FemaleWBC": 4.46,
-"MaleHGB": 11.34, 
-"FemaleHGB": 8.1, 
-"NormalRBC": 3.645, 
-"MildAnemiaRBC": 5.265, 
-"ModerateAnemiaRBC": 7.695,
-"SevereAnemiaRBC":8.55,
-"PolycythemiaRBC":10.55,
-"UL95CI_MaleWBC": [5.1, 4.62],
-"UL95CI_FemaleWBC": [4.68, 4.23],
-"UL95CI_MaleHGB": [11.91, 10.78],
-"UL95CI_FemaleHGB": [8.51, 7.7]
-
-},
-{ 
-"time": "2024-03", 
-"Age":12,
-"sex":"all",
-"MaleWBC": 5.589,  
-"FemaleWBC": 5.129,
-"MaleHGB": 13.04, 
-"FemaleHGB": 9.315, 
-"NormalRBC": 4.1925, 
-"MildAnemiaRBC": 6.1275, 
-"ModerateAnemiaRBC": 8.9325,
-"SevereAnemiaRBC":7.55,
-"PolycythemiaRBC":9.55,
-"UL95CI_MaleWBC": [5.87, 5.31],
-"UL95CI_FemaleWBC": [5.39, 4.87],
-"UL95CI_MaleHGB": [13.69, 12.39],
-"UL95CI_FemaleHGB": [9.78, 8.85]
-
-},
-{ 
-"time": "2024-04", 
-"Age":12,
-"sex":"all",
-"MaleWBC": 5.03,  
-"FemaleWBC": 4.616,
-"MaleHGB": 11.74, 
-"FemaleHGB": 8.38, 
-"NormalRBC": 3.773, 
-"MildAnemiaRBC": 5.542, 
-"ModerateAnemiaRBC": 8.06,
-"SevereAnemiaRBC":6.55,
-"PolycythemiaRBC":8.55,
-"UL95CI_MaleWBC": [5.28, 4.78],
-"UL95CI_FemaleWBC": [4.85, 4.39],
-"UL95CI_MaleHGB": [12.33, 11.15],
-"UL95CI_FemaleHGB": [8.8, 7.96]
-},
-{ 
-"time": "2024-05", 
-"Age":12,
-"sex":"all",
-"MaleWBC": 5.308,
-"FemaleWBC": 5.7845,  
-"MaleHGB": 13.5, 
-"FemaleHGB": 9.64, 
-"NormalRBC": 4.338, 
-"MildAnemiaRBC": 6.373, 
-"ModerateAnemiaRBC": 9.28,
-"SevereAnemiaRBC":5.55,
-"PolycythemiaRBC":7.55,
-"UL95CI_MaleWBC": [5.57, 5.04],
-"UL95CI_FemaleWBC": [6.07, 5.5],
-"UL95CI_MaleHGB": [14.18, 12.83],
-"UL95CI_FemaleHGB": [10.12, 9.16]
-},
-{ 
-"time": "2024-06", 
-"Age":12,
-"sex":"all",
-"MaleWBC": 5.206,  
-"FemaleWBC": 4.777,
-"MaleHGB": 12.15, 
-"FemaleHGB": 8.676, 
-"NormalRBC": 3.904, 
-"MildAnemiaRBC": 5.736, 
-"ModerateAnemiaRBC": 8.36,
-"SevereAnemiaRBC":4.55,
-"PolycythemiaRBC":6.55,
-"UL95CI_MaleWBC": [5.47, 4.94],
-"UL95CI_FemaleWBC": [5.02, 4.54],
-"UL95CI_MaleHGB": [12.76, 11.55],
-"UL95CI_FemaleHGB": [9.11, 8.24]
-},
-{ 
-"time": "2024-07", 
-"Age":12,
-"sex":"all",
-"MaleWBC": 5.986,  
-"FemaleWBC": 5.493,
-"MaleHGB": 13.97, 
-"FemaleHGB": 9.977, 
-"NormalRBC": 4.49, 
-"MildAnemiaRBC": 6.6, 
-"ModerateAnemiaRBC": 9.6,
-"SevereAnemiaRBC":9.55,
-"PolycythemiaRBC":11.55,
-"UL95CI_MaleWBC": [6.29, 5.69],
-"UL95CI_FemaleWBC": [5.77, 5.22],
-"UL95CI_MaleHGB": [14.66, 13.27],
-"UL95CI_FemaleHGB": [10.48, 9.48]
-},
-{ 
-"time": "2024-08", 
-"Age":12,
-"sex":"all",
-"MaleWBC":  4.944,
-"FemaleWBC": 5.387,
-"MaleHGB": 12.58, 
-"FemaleHGB": 8.979, 
-"NormalRBC": 4.041, 
-"MildAnemiaRBC": 5.94, 
-"ModerateAnemiaRBC": 8.64,
-"SevereAnemiaRBC":10.55,
-"PolycythemiaRBC":12.55,
-"UL95CI_MaleWBC": [5.19, 4.7],
-"UL95CI_FemaleWBC": [5.66, 5.11],
-"UL95CI_MaleHGB": [13.21, 11.95],
-"UL95CI_FemaleHGB": [9.43, 8.53]
-},
-{ 
-"time": "2024-09", 
-"Age":12,
-"sex":"all",
-"MaleWBC": 6.195,  
-"FemaleWBC": 5.685,
-"MaleHGB": 14.47, 
-"FemaleHGB": 10.33, 
-"NormalRBC": 4.647, 
-"MildAnemiaRBC": 6.837, 
-"ModerateAnemiaRBC": 9.945,
-"SevereAnemiaRBC":11.55,
-"PolycythemiaRBC":13.55,
-"UL95CI_MaleWBC": [6.51, 5.88],
-"UL95CI_FemaleWBC": [5.97, 5.4],
-"UL95CI_MaleHGB": [15.19, 13.74],
-"UL95CI_FemaleHGB": [10.85, 9.81]
-},
-{ 
-"time": "2024-10", 
-"Age":12,
-"sex":"all",
-"MaleWBC": 5.575,  
-"FemaleWBC": 5.116,
-"MaleHGB": 13.02, 
-"FemaleHGB": 9.297, 
-"NormalRBC": 4.182, 
-"MildAnemiaRBC": 6.156, 
-"ModerateAnemiaRBC": 8.964,
-"SevereAnemiaRBC":9.55,
-"PolycythemiaRBC":11.55,
-"UL95CI_MaleWBC": [5.85, 5.29],
-"UL95CI_FemaleWBC": [5.37, 4.86],
-"UL95CI_MaleHGB": [13.67, 12.37],
-"UL95CI_FemaleHGB": [9.76, 8.83]
-},
-{ 
-"time": "2024-02", 
-"Age":12,
-"sex":"male",
-"MaleWBC": 5.4,  
-"MaleHGB": 12.6, 
-"NormalRBC": 4.05, 
-"MildAnemiaRBC": 5.85, 
-"ModerateAnemiaRBC": 8.55,
-"SevereAnemiaRBC":9.55,
-"PolycythemiaRBC":11.55,
-"UL95CI_MaleWBC": [5.67, 5.13],
-"UL95CI_MaleHGB": [13.23, 11.97],
-},
-{ 
-"time": "2024-03", 
-"Age":12,
-"sex":"male",
-"MaleWBC": 4.86,  
-"MaleHGB": 11.34, 
-"NormalRBC": 3.645, 
-"MildAnemiaRBC": 5.265, 
-"ModerateAnemiaRBC": 7.695,
-"SevereAnemiaRBC":8.55,
-"PolycythemiaRBC":10.55,
-"UL95CI_MaleWBC": [5.1, 4.62],
-"UL95CI_MaleHGB": [11.91, 10.78],
-
-},
-{ 
-"time": "2024-04", 
-"Age":12,
-"sex":"male",
-"MaleWBC": 5.589,  
-"MaleHGB": 13.04, 
-"NormalRBC": 4.1925, 
-"MildAnemiaRBC": 6.1275, 
-"ModerateAnemiaRBC": 8.9325,
-"SevereAnemiaRBC":7.55,
-"PolycythemiaRBC":9.55,
-"UL95CI_MaleWBC": [5.87, 5.31],
-"UL95CI_MaleHGB": [13.69, 12.39],
-
-},
-{ 
-"time": "2024-05", 
-"Age":12,
-"sex":"male",
-"MaleWBC": 5.03,  
-"MaleHGB": 11.74, 
-"NormalRBC": 3.773, 
-"MildAnemiaRBC": 5.542, 
-"ModerateAnemiaRBC": 8.06,
-"SevereAnemiaRBC":6.55,
-"PolycythemiaRBC":8.55,
-"UL95CI_MaleWBC": [5.28, 4.78],
-"UL95CI_MaleHGB": [12.33, 11.15],
-},
-{ 
-"time": "2024-06", 
-"Age":12,
-"sex":"male",
-"MaleWBC": 5.308,
-"MaleHGB": 13.5, 
-"NormalRBC": 4.338, 
-"MildAnemiaRBC": 6.373, 
-"ModerateAnemiaRBC": 9.28,
-"SevereAnemiaRBC":5.55,
-"PolycythemiaRBC":7.55,
-"UL95CI_MaleWBC": [5.57, 5.04],
-"UL95CI_MaleHGB": [14.18, 12.83],
-},
-{ 
-"time": "2024-07", 
-"Age":12,
-"sex":"male",
-"MaleWBC": 5.206,  
-"MaleHGB": 12.15, 
-"NormalRBC": 3.904, 
-"MildAnemiaRBC": 5.736, 
-"ModerateAnemiaRBC": 8.36,
-"SevereAnemiaRBC":4.55,
-"PolycythemiaRBC":6.55,
-"UL95CI_MaleWBC": [5.47, 4.94],
-"UL95CI_MaleHGB": [12.76, 11.55],
-},
-{ 
-"time": "2024-08", 
-"Age":12,
-"sex":"male",
-"MaleWBC": 5.986,  
-"MaleHGB": 13.97, 
-"NormalRBC": 4.49, 
-"MildAnemiaRBC": 6.6, 
-"ModerateAnemiaRBC": 9.6,
-"SevereAnemiaRBC":9.55,
-"PolycythemiaRBC":11.55,
-"UL95CI_MaleWBC": [6.29, 5.69],
-"UL95CI_MaleHGB": [14.66, 13.27],
-},
-{ 
-"time": "2024-09", 
-"Age":12,
-"sex":"male",
-"MaleWBC":  4.944,
-"MaleHGB": 12.58, 
-"NormalRBC": 4.041, 
-"MildAnemiaRBC": 5.94, 
-"ModerateAnemiaRBC": 8.64,
-"SevereAnemiaRBC":10.55,
-"PolycythemiaRBC":12.55,
-"UL95CI_MaleWBC": [5.19, 4.7],
-"UL95CI_MaleHGB": [13.21, 11.95],
-},
-{ 
-"time": "2024-10", 
-"Age":12,
-"sex":"male",
-"MaleWBC": 6.195,  
-"MaleHGB": 14.47, 
-"NormalRBC": 4.647, 
-"MildAnemiaRBC": 6.837, 
-"ModerateAnemiaRBC": 9.945,
-"SevereAnemiaRBC":11.55,
-"PolycythemiaRBC":13.55,
-"UL95CI_MaleWBC": [6.51, 5.88],
-"UL95CI_MaleHGB": [15.19, 13.74],
-},
-{ 
-"time": "2024-11", 
-"Age":12,
-"sex":"male",
-"MaleWBC": 5.575,  
-"MaleHGB": 13.02, 
-"NormalRBC": 4.182, 
-"MildAnemiaRBC": 6.156, 
-"ModerateAnemiaRBC": 8.964,
-"SevereAnemiaRBC":9.55,
-"PolycythemiaRBC":11.55,
-"UL95CI_MaleWBC": [5.85, 5.29],
-"UL95CI_MaleHGB": [13.67, 12.37],
-},
-    { 
-    "time": "2024-01", 
-    "Age":12,
-    "sex":"female",
-    "FemaleWBC": 4.95,
-    "FemaleHGB": 9, 
-    "NormalRBC": 4.05, 
-    "MildAnemiaRBC": 5.85, 
-    "ModerateAnemiaRBC": 8.55,
-    "SevereAnemiaRBC":9.55,
-    "PolycythemiaRBC":11.55,
-    "UL95CI_FemaleWBC": [5.2, 4.7],
-    "UL95CI_FemaleHGB": [9.45, 8.55]
-    },
-    { 
-    "time": "2024-02", 
-    "Age":12,
-    "sex":"female",
-    "FemaleWBC": 4.46,
-    "FemaleHGB": 8.1, 
-    "NormalRBC": 3.645, 
-    "MildAnemiaRBC": 5.265, 
-    "ModerateAnemiaRBC": 7.695,
-    "SevereAnemiaRBC":8.55,
-    "PolycythemiaRBC":10.55,
-    "UL95CI_FemaleWBC": [4.68, 4.23],
-    "UL95CI_FemaleHGB": [8.51, 7.7]
-    
-    },
-    { 
-    "time": "2024-03", 
-    "Age":12,
-    "sex":"female",
-    "FemaleWBC": 5.129,
-    "FemaleHGB": 9.315, 
-    "NormalRBC": 4.1925, 
-    "MildAnemiaRBC": 6.1275, 
-    "ModerateAnemiaRBC": 8.9325,
-    "SevereAnemiaRBC":7.55,
-    "PolycythemiaRBC":9.55,
-    "UL95CI_FemaleWBC": [5.39, 4.87],
-    "UL95CI_FemaleHGB": [9.78, 8.85]
-    
-    },
-    { 
-    "time": "2024-04", 
-    "Age":12,
-    "sex":"female",
-    "FemaleWBC": 4.616,
-    "FemaleHGB": 8.38, 
-    "NormalRBC": 3.773, 
-    "MildAnemiaRBC": 5.542, 
-    "ModerateAnemiaRBC": 8.06,
-    "SevereAnemiaRBC":6.55,
-    "PolycythemiaRBC":8.55,
-    "UL95CI_FemaleWBC": [4.85, 4.39],
-    "UL95CI_FemaleHGB": [8.8, 7.96]
-    },
-    { 
-    "time": "2024-05", 
-    "Age":12,
-    "sex":"female",
-    "FemaleWBC": 5.7845,  
-    "FemaleHGB": 9.64, 
-    "NormalRBC": 4.338, 
-    "MildAnemiaRBC": 6.373, 
-    "ModerateAnemiaRBC": 9.28,
-    "SevereAnemiaRBC":5.55,
-    "PolycythemiaRBC":7.55,
-    "UL95CI_FemaleWBC": [6.07, 5.5],
-    "UL95CI_FemaleHGB": [10.12, 9.16]
-    },
-    { 
-    "time": "2024-06", 
-    "Age":12,
-    "sex":"female",
-    "FemaleWBC": 4.777,
-    "FemaleHGB": 8.676, 
-    "NormalRBC": 3.904, 
-    "MildAnemiaRBC": 5.736, 
-    "ModerateAnemiaRBC": 8.36,
-    "SevereAnemiaRBC":4.55,
-    "PolycythemiaRBC":6.55,
-    "UL95CI_FemaleWBC": [5.02, 4.54],
-    "UL95CI_FemaleHGB": [9.11, 8.24]
-    },
-    { 
-    "time": "2024-07", 
-    "Age":12,
-    "sex":"female",
-    "FemaleWBC": 5.493,
-    "FemaleHGB": 9.977, 
-    "NormalRBC": 4.49, 
-    "MildAnemiaRBC": 6.6, 
-    "ModerateAnemiaRBC": 9.6,
-    "SevereAnemiaRBC":9.55,
-    "PolycythemiaRBC":11.55,
-    "UL95CI_FemaleWBC": [5.77, 5.22],
-    "UL95CI_FemaleHGB": [10.48, 9.48]
-    },
-    { 
-    "time": "2024-08", 
-    "Age":12,
-    "sex":"female",
-    "FemaleWBC": 5.387,
-    "FemaleHGB": 8.979, 
-    "NormalRBC": 4.041, 
-    "MildAnemiaRBC": 5.94, 
-    "ModerateAnemiaRBC": 8.64,
-    "SevereAnemiaRBC":10.55,
-    "PolycythemiaRBC":12.55,
-    "UL95CI_FemaleWBC": [5.66, 5.11],
-    "UL95CI_FemaleHGB": [9.43, 8.53]
-    },
-    { 
-    "time": "2024-09", 
-    "Age":12,
-    "sex":"female",
-    "FemaleWBC": 5.685,
-    "FemaleHGB": 10.33, 
-    "NormalRBC": 4.647, 
-    "MildAnemiaRBC": 6.837, 
-    "ModerateAnemiaRBC": 9.945,
-    "SevereAnemiaRBC":11.55,
-    "PolycythemiaRBC":13.55,
-    "UL95CI_FemaleWBC": [5.97, 5.4],
-    "UL95CI_FemaleHGB": [10.85, 9.81]
-    },
-    { 
-    "time": "2024-10", 
-    "Age":12,
-    "sex":"female",
-    "FemaleWBC": 5.116,
-    "FemaleHGB": 9.297, 
-    "NormalRBC": 4.182, 
-    "MildAnemiaRBC": 6.156, 
-    "ModerateAnemiaRBC": 8.964,
-    "SevereAnemiaRBC":9.55,
-    "PolycythemiaRBC":11.55,
-    "UL95CI_FemaleWBC": [5.37, 4.86],
-    "UL95CI_FemaleHGB": [9.76, 8.83]
-    },
-    
-{ 
-    "time": "2024-02", 
-    "Age":32,
-    "sex":"all",
-    "MaleWBC": 5.4,  
-    "FemaleWBC": 4.95,
-    "MaleHGB": 12.6, 
-    "FemaleHGB": 9, 
-    "NormalRBC": 4.05, 
-    "MildAnemiaRBC": 5.85, 
-    "ModerateAnemiaRBC": 8.55,
-    "SevereAnemiaRBC":9.55,
-    "PolycythemiaRBC":11.55,
-    "UL95CI_MaleWBC": [5.67, 5.13],
-    "UL95CI_FemaleWBC": [5.2, 4.7],
-    "UL95CI_MaleHGB": [13.23, 11.97],
-    "UL95CI_FemaleHGB": [9.45, 8.55]
-    },
-    { 
-    "time": "2024-03", 
-    "Age":32,
-    "sex":"all",
-    "MaleWBC": 4.86,  
-    "FemaleWBC": 4.46,
-    "MaleHGB": 11.34, 
-    "FemaleHGB": 8.1, 
-    "NormalRBC": 3.645, 
-    "MildAnemiaRBC": 5.265, 
-    "ModerateAnemiaRBC": 7.695,
-    "SevereAnemiaRBC":8.55,
-    "PolycythemiaRBC":10.55,
-    "UL95CI_MaleWBC": [5.1, 4.62],
-    "UL95CI_FemaleWBC": [4.68, 4.23],
-    "UL95CI_MaleHGB": [11.91, 10.78],
-    "UL95CI_FemaleHGB": [8.51, 7.7]
-    
-    },
-    { 
-    "time": "2024-04", 
-    "Age":32,
-    "sex":"all",
-    "MaleWBC": 5.589,  
-    "FemaleWBC": 5.129,
-    "MaleHGB": 13.04, 
-    "FemaleHGB": 9.315, 
-    "NormalRBC": 4.1925, 
-    "MildAnemiaRBC": 6.1275, 
-    "ModerateAnemiaRBC": 8.9325,
-    "SevereAnemiaRBC":7.55,
-    "PolycythemiaRBC":9.55,
-    "UL95CI_MaleWBC": [5.87, 5.31],
-    "UL95CI_FemaleWBC": [5.39, 4.87],
-    "UL95CI_MaleHGB": [13.69, 12.39],
-    "UL95CI_FemaleHGB": [9.78, 8.85]
-    
-    },
-    { 
-    "time": "2024-05", 
-    "Age":32,
-    "sex":"all",
-    "MaleWBC": 5.03,  
-    "FemaleWBC": 4.616,
-    "MaleHGB": 11.74, 
-    "FemaleHGB": 8.38, 
-    "NormalRBC": 3.773, 
-    "MildAnemiaRBC": 5.542, 
-    "ModerateAnemiaRBC": 8.06,
-    "SevereAnemiaRBC":6.55,
-    "PolycythemiaRBC":8.55,
-    "UL95CI_MaleWBC": [5.28, 4.78],
-    "UL95CI_FemaleWBC": [4.85, 4.39],
-    "UL95CI_MaleHGB": [12.33, 11.15],
-    "UL95CI_FemaleHGB": [8.8, 7.96]
-    },
-    { 
-    "time": "2024-06", 
-    "Age":32,
-    "sex":"all",
-    "MaleWBC": 5.308,
-    "FemaleWBC": 5.7845,  
-    "MaleHGB": 13.5, 
-    "FemaleHGB": 9.64, 
-    "NormalRBC": 4.338, 
-    "MildAnemiaRBC": 6.373, 
-    "ModerateAnemiaRBC": 9.28,
-    "SevereAnemiaRBC":5.55,
-    "PolycythemiaRBC":7.55,
-    "UL95CI_MaleWBC": [5.57, 5.04],
-    "UL95CI_FemaleWBC": [6.07, 5.5],
-    "UL95CI_MaleHGB": [14.18, 12.83],
-    "UL95CI_FemaleHGB": [10.12, 9.16]
-    },
-    { 
-    "time": "2024-07", 
-    "Age":32,
-    "sex":"all",
-    "MaleWBC": 5.206,  
-    "FemaleWBC": 4.777,
-    "MaleHGB": 12.15, 
-    "FemaleHGB": 8.676, 
-    "NormalRBC": 3.904, 
-    "MildAnemiaRBC": 5.736, 
-    "ModerateAnemiaRBC": 8.36,
-    "SevereAnemiaRBC":4.55,
-    "PolycythemiaRBC":6.55,
-    "UL95CI_MaleWBC": [5.47, 4.94],
-    "UL95CI_FemaleWBC": [5.02, 4.54],
-    "UL95CI_MaleHGB": [12.76, 11.55],
-    "UL95CI_FemaleHGB": [9.11, 8.24]
-    },
-    { 
-    "time": "2024-08", 
-    "Age":32,
-    "sex":"all",
-    "MaleWBC": 5.986,  
-    "FemaleWBC": 5.493,
-    "MaleHGB": 13.97, 
-    "FemaleHGB": 9.977, 
-    "NormalRBC": 4.49, 
-    "MildAnemiaRBC": 6.6, 
-    "ModerateAnemiaRBC": 9.6,
-    "SevereAnemiaRBC":9.55,
-    "PolycythemiaRBC":11.55,
-    "UL95CI_MaleWBC": [6.29, 5.69],
-    "UL95CI_FemaleWBC": [5.77, 5.22],
-    "UL95CI_MaleHGB": [14.66, 13.27],
-    "UL95CI_FemaleHGB": [10.48, 9.48]
-    },
-    { 
-    "time": "2024-09", 
-    "Age":32,
-    "sex":"all",
-    "MaleWBC":  4.944,
-    "FemaleWBC": 5.387,
-    "MaleHGB": 12.58, 
-    "FemaleHGB": 8.979, 
-    "NormalRBC": 4.041, 
-    "MildAnemiaRBC": 5.94, 
-    "ModerateAnemiaRBC": 8.64,
-    "SevereAnemiaRBC":10.55,
-    "PolycythemiaRBC":12.55,
-    "UL95CI_MaleWBC": [5.19, 4.7],
-    "UL95CI_FemaleWBC": [5.66, 5.11],
-    "UL95CI_MaleHGB": [13.21, 11.95],
-    "UL95CI_FemaleHGB": [9.43, 8.53]
-    },
-    { 
-    "time": "2024-10", 
-    "Age":32,
-    "sex":"all",
-    "MaleWBC": 6.195,  
-    "FemaleWBC": 5.685,
-    "MaleHGB": 14.47, 
-    "FemaleHGB": 10.33, 
-    "NormalRBC": 4.647, 
-    "MildAnemiaRBC": 6.837, 
-    "ModerateAnemiaRBC": 9.945,
-    "SevereAnemiaRBC":11.55,
-    "PolycythemiaRBC":13.55,
-    "UL95CI_MaleWBC": [6.51, 5.88],
-    "UL95CI_FemaleWBC": [5.97, 5.4],
-    "UL95CI_MaleHGB": [15.19, 13.74],
-    "UL95CI_FemaleHGB": [10.85, 9.81]
-    },
-    { 
-    "time": "2024-11", 
-    "Age":32,
-    "sex":"all",
-    "MaleWBC": 5.575,  
-    "FemaleWBC": 5.116,
-    "MaleHGB": 13.02, 
-    "FemaleHGB": 9.297, 
-    "NormalRBC": 4.182, 
-    "MildAnemiaRBC": 6.156, 
-    "ModerateAnemiaRBC": 8.964,
-    "SevereAnemiaRBC":9.55,
-    "PolycythemiaRBC":11.55,
-    "UL95CI_MaleWBC": [5.85, 5.29],
-    "UL95CI_FemaleWBC": [5.37, 4.86],
-    "UL95CI_MaleHGB": [13.67, 12.37],
-    "UL95CI_FemaleHGB": [9.76, 8.83]
-    },
-    { 
-    "time": "2024-01", 
-    "Age":32,
-    "sex":"male",
-    "MaleWBC": 5.4,  
-    "MaleHGB": 12.6, 
-    "NormalRBC": 4.05, 
-    "MildAnemiaRBC": 5.85, 
-    "ModerateAnemiaRBC": 8.55,
-    "SevereAnemiaRBC":9.55,
-    "PolycythemiaRBC":11.55,
-    "UL95CI_MaleWBC": [5.67, 5.13],
-    "UL95CI_MaleHGB": [13.23, 11.97],
-    },
-    { 
-    "time": "2024-02", 
-    "Age":32,
-    "sex":"male",
-    "MaleWBC": 4.86,  
-    "MaleHGB": 11.34, 
-    "NormalRBC": 3.645, 
-    "MildAnemiaRBC": 5.265, 
-    "ModerateAnemiaRBC": 7.695,
-    "SevereAnemiaRBC":8.55,
-    "PolycythemiaRBC":10.55,
-    "UL95CI_MaleWBC": [5.1, 4.62],
-    "UL95CI_MaleHGB": [11.91, 10.78],
-    
-    },
-    { 
-    "time": "2024-03", 
-    "Age":32,
-    "sex":"male",
-    "MaleWBC": 5.589,  
-    "MaleHGB": 13.04, 
-    "NormalRBC": 4.1925, 
-    "MildAnemiaRBC": 6.1275, 
-    "ModerateAnemiaRBC": 8.9325,
-    "SevereAnemiaRBC":7.55,
-    "PolycythemiaRBC":9.55,
-    "UL95CI_MaleWBC": [5.87, 5.31],
-    "UL95CI_MaleHGB": [13.69, 12.39],
-    
-    },
-    { 
-    "time": "2024-04", 
-    "Age":32,
-    "sex":"male",
-    "MaleWBC": 5.03,  
-    "MaleHGB": 11.74, 
-    "NormalRBC": 3.773, 
-    "MildAnemiaRBC": 5.542, 
-    "ModerateAnemiaRBC": 8.06,
-    "SevereAnemiaRBC":6.55,
-    "PolycythemiaRBC":8.55,
-    "UL95CI_MaleWBC": [5.28, 4.78],
-    "UL95CI_MaleHGB": [12.33, 11.15],
-    },
-    { 
-    "time": "2024-05", 
-    "Age":32,
-    "sex":"male",
-    "MaleWBC": 5.308,
-    "MaleHGB": 13.5, 
-    "NormalRBC": 4.338, 
-    "MildAnemiaRBC": 6.373, 
-    "ModerateAnemiaRBC": 9.28,
-    "SevereAnemiaRBC":5.55,
-    "PolycythemiaRBC":7.55,
-    "UL95CI_MaleWBC": [5.57, 5.04],
-    "UL95CI_MaleHGB": [14.18, 12.83],
-    },
-    { 
-    "time": "2024-06", 
-    "Age":32,
-    "sex":"male",
-    "MaleWBC": 5.206,  
-    "MaleHGB": 12.15, 
-    "NormalRBC": 3.904, 
-    "MildAnemiaRBC": 5.736, 
-    "ModerateAnemiaRBC": 8.36,
-    "SevereAnemiaRBC":4.55,
-    "PolycythemiaRBC":6.55,
-    "UL95CI_MaleWBC": [5.47, 4.94],
-    "UL95CI_MaleHGB": [12.76, 11.55],
-    },
-    { 
-    "time": "2024-07", 
-    "Age":32,
-    "sex":"male",
-    "MaleWBC": 5.986,  
-    "MaleHGB": 13.97, 
-    "NormalRBC": 4.49, 
-    "MildAnemiaRBC": 6.6, 
-    "ModerateAnemiaRBC": 9.6,
-    "SevereAnemiaRBC":9.55,
-    "PolycythemiaRBC":11.55,
-    "UL95CI_MaleWBC": [6.29, 5.69],
-    "UL95CI_MaleHGB": [14.66, 13.27],
-    },
-    { 
-    "time": "2024-08", 
-    "Age":32,
-    "sex":"male",
-    "MaleWBC":  4.944,
-    "MaleHGB": 12.58, 
-    "NormalRBC": 4.041, 
-    "MildAnemiaRBC": 5.94, 
-    "ModerateAnemiaRBC": 8.64,
-    "SevereAnemiaRBC":10.55,
-    "PolycythemiaRBC":12.55,
-    "UL95CI_MaleWBC": [5.19, 4.7],
-    "UL95CI_MaleHGB": [13.21, 11.95],
-    },
-    { 
-    "time": "2024-09", 
-    "Age":32,
-    "sex":"male",
-    "MaleWBC": 6.195,  
-    "MaleHGB": 14.47, 
-    "NormalRBC": 4.647, 
-    "MildAnemiaRBC": 6.837, 
-    "ModerateAnemiaRBC": 9.945,
-    "SevereAnemiaRBC":11.55,
-    "PolycythemiaRBC":13.55,
-    "UL95CI_MaleWBC": [6.51, 5.88],
-    "UL95CI_MaleHGB": [15.19, 13.74],
-    },
-    { 
-    "time": "2024-10", 
-    "Age":32,
-    "sex":"male",
-    "MaleWBC": 5.575,  
-    "MaleHGB": 13.02, 
-    "NormalRBC": 4.182, 
-    "MildAnemiaRBC": 6.156, 
-    "ModerateAnemiaRBC": 8.964,
-    "SevereAnemiaRBC":9.55,
-    "PolycythemiaRBC":11.55,
-    "UL95CI_MaleWBC": [5.85, 5.29],
-    "UL95CI_MaleHGB": [13.67, 12.37],
-    },
-        { 
-        "time": "2024-02", 
-        "Age":32,
-        "sex":"female",
-        "FemaleWBC": 4.95,
-        "FemaleHGB": 9, 
-        "NormalRBC": 4.05, 
-        "MildAnemiaRBC": 5.85, 
-        "ModerateAnemiaRBC": 8.55,
-        "SevereAnemiaRBC":9.55,
-        "PolycythemiaRBC":11.55,
-        "UL95CI_FemaleWBC": [5.2, 4.7],
-        "UL95CI_FemaleHGB": [9.45, 8.55]
-        },
-        { 
-        "time": "2024-03", 
-        "Age":32,
-        "sex":"female",
-        "FemaleWBC": 4.46,
-        "FemaleHGB": 8.1, 
-        "NormalRBC": 3.645, 
-        "MildAnemiaRBC": 5.265, 
-        "ModerateAnemiaRBC": 7.695,
-        "SevereAnemiaRBC":8.55,
-        "PolycythemiaRBC":10.55,
-        "UL95CI_FemaleWBC": [4.68, 4.23],
-        "UL95CI_FemaleHGB": [8.51, 7.7]
-        
-        },
-        { 
-        "time": "2024-04", 
-        "Age":32,
-        "sex":"female",
-        "FemaleWBC": 5.129,
-        "FemaleHGB": 9.315, 
-        "NormalRBC": 4.1925, 
-        "MildAnemiaRBC": 6.1275, 
-        "ModerateAnemiaRBC": 8.9325,
-        "SevereAnemiaRBC":7.55,
-        "PolycythemiaRBC":9.55,
-        "UL95CI_FemaleWBC": [5.39, 4.87],
-        "UL95CI_FemaleHGB": [9.78, 8.85]
-        
-        },
-        { 
-        "time": "2024-05", 
-        "Age":32,
-        "sex":"female",
-        "FemaleWBC": 4.616,
-        "FemaleHGB": 8.38, 
-        "NormalRBC": 3.773, 
-        "MildAnemiaRBC": 5.542, 
-        "ModerateAnemiaRBC": 8.06,
-        "SevereAnemiaRBC":6.55,
-        "PolycythemiaRBC":8.55,
-        "UL95CI_FemaleWBC": [4.85, 4.39],
-        "UL95CI_FemaleHGB": [8.8, 7.96]
-        },
-        { 
-        "time": "2024-06", 
-        "Age":32,
-        "sex":"female",
-        "FemaleWBC": 5.7845,  
-        "FemaleHGB": 9.64, 
-        "NormalRBC": 4.338, 
-        "MildAnemiaRBC": 6.373, 
-        "ModerateAnemiaRBC": 9.28,
-        "SevereAnemiaRBC":5.55,
-        "PolycythemiaRBC":7.55,
-        "UL95CI_FemaleWBC": [6.07, 5.5],
-        "UL95CI_FemaleHGB": [10.12, 9.16]
-        },
-        { 
-        "time": "2024-07", 
-        "Age":32,
-        "sex":"female",
-        "FemaleWBC": 4.777,
-        "FemaleHGB": 8.676, 
-        "NormalRBC": 3.904, 
-        "MildAnemiaRBC": 5.736, 
-        "ModerateAnemiaRBC": 8.36,
-        "SevereAnemiaRBC":4.55,
-        "PolycythemiaRBC":6.55,
-        "UL95CI_FemaleWBC": [5.02, 4.54],
-        "UL95CI_FemaleHGB": [9.11, 8.24]
-        },
-        { 
-        "time": "2024-08", 
-        "Age":32,
-        "sex":"female",
-        "FemaleWBC": 5.493,
-        "FemaleHGB": 9.977, 
-        "NormalRBC": 4.49, 
-        "MildAnemiaRBC": 6.6, 
-        "ModerateAnemiaRBC": 9.6,
-        "SevereAnemiaRBC":9.55,
-        "PolycythemiaRBC":11.55,
-        "UL95CI_FemaleWBC": [5.77, 5.22],
-        "UL95CI_FemaleHGB": [10.48, 9.48]
-        },
-        { 
-        "time": "2024-09", 
-        "Age":32,
-        "sex":"female",
-        "FemaleWBC": 5.387,
-        "FemaleHGB": 8.979, 
-        "NormalRBC": 4.041, 
-        "MildAnemiaRBC": 5.94, 
-        "ModerateAnemiaRBC": 8.64,
-        "SevereAnemiaRBC":10.55,
-        "PolycythemiaRBC":12.55,
-        "UL95CI_FemaleWBC": [5.66, 5.11],
-        "UL95CI_FemaleHGB": [9.43, 8.53]
-        },
-        { 
-        "time": "2024-10", 
-        "Age":32,
-        "sex":"female",
-        "FemaleWBC": 5.685,
-        "FemaleHGB": 10.33, 
-        "NormalRBC": 4.647, 
-        "MildAnemiaRBC": 6.837, 
-        "ModerateAnemiaRBC": 9.945,
-        "SevereAnemiaRBC":11.55,
-        "PolycythemiaRBC":13.55,
-        "UL95CI_FemaleWBC": [5.97, 5.4],
-        "UL95CI_FemaleHGB": [10.85, 9.81]
-        },
-        { 
-        "time": "2024-11", 
-        "Age":32,
-        "sex":"female",
-        "FemaleWBC": 5.116,
-        "FemaleHGB": 9.297, 
-        "NormalRBC": 4.182, 
-        "MildAnemiaRBC": 6.156, 
-        "ModerateAnemiaRBC": 8.964,
-        "SevereAnemiaRBC":9.55,
-        "PolycythemiaRBC":11.55,
-        "UL95CI_FemaleWBC": [5.37, 4.86],
-        "UL95CI_FemaleHGB": [9.76, 8.83]
-        },
-];
+  
 
 const ControlAndDisplay: React.FC = () => {
+    const [initialDummyData, setInitialDummyData] = useState([]);
 
-       
-   
+    const data = [
+                ['fo', 10], ['um', 11], ['us', 12], ['jp', 13], ['sc', 14], ['fr', 15],
+                ['fm', 16], ['cn', 17], ['pt', 18], ['sw', 19], ['sh', 20], ['br', 21],
+                ['ki', 22], ['ph', 23], ['mx', 24], ['bu', 25], ['mv', 26], ['sp', 27],
+                ['gb', 28], ['gr', 29], ['as', 30], ['dk', 31], ['gl', 32], ['gu', 33],
+                ['mp', 34], ['pr', 35], ['vi', 36], ['ca', 37], ['st', 38], ['cv', 39],
+                ['dm', 40], ['nl', 41], ['jm', 42], ['ws', 43], ['om', 44], ['vc', 45],
+                ['tr', 46], ['bd', 47], ['lc', 48], ['nr', 49], ['no', 50], ['kn', 51],
+                ['bh', 52], ['to', 53], ['fi', 54], ['id', 55], ['mu', 56], ['se', 57],
+                ['tt', 58], ['my', 59], ['pa', 60], ['pw', 61], ['tv', 62], ['mh', 63],
+                ['th', 64], ['gd', 65], ['ee', 66], ['ag', 67], ['tw', 68], ['bb', 69],
+                ['it', 70], ['mt', 71], ['vu', 72], ['sg', 73], ['cy', 74], ['lk', 75],
+                ['km', 76], ['fj', 77], ['ru', 78], ['va', 79], ['sm', 80], ['kz', 81],
+                ['az', 82], ['am', 83], ['tj', 84], ['ls', 85], ['uz', 86], ['in', 87],
+                ['es', 88], ['ma', 89], ['ec', 90], ['co', 91], ['tl', 92], ['tz', 93],
+                ['ar', 94], ['sa', 95], ['pk', 96], ['ye', 97], ['ae', 98], ['ke', 99],
+                ['pe', 100], ['do', 101], ['ht', 102], ['ao', 103], ['kh', 104],
+                ['vn', 105], ['mz', 106], ['cr', 107], ['bj', 108], ['ng', 109],
+                ['ir', 110], ['sv', 111], ['cl', 112], ['sl', 113], ['gw', 114],
+                ['hr', 115], ['bz', 116], ['za', 117], ['cf', 118], ['sd', 119],
+                ['ly', 120], ['cd', 121], ['kw', 122], ['pg', 123], ['de', 124],
+                ['ch', 125], ['er', 126], ['ie', 127], ['kp', 128], ['kr', 129],
+                ['gy', 130], ['hn', 131], ['mm', 132], ['ga', 133], ['gq', 134],
+                ['ni', 135], ['lv', 136], ['ug', 137], ['mw', 138], ['sx', 139],
+                ['tm', 140], ['zm', 141], ['nc', 142], ['mr', 143], ['dz', 144],
+                ['lt', 145], ['et', 146], ['gh', 147], ['si', 148], ['gt', 149],
+                ['ba', 150], ['jo', 151], ['sy', 152], ['mc', 153], ['al', 154],
+                ['uy', 155], ['cnm', 156], ['mn', 157], ['rw', 158], ['so', 159],
+                ['bo', 160], ['cm', 161], ['cg', 162], ['eh', 163], ['rs', 164],
+                ['me', 165], ['tg', 166], ['la', 167], ['af', 168], ['ua', 169],
+                ['sk', 170], ['jk', 171], ['bg', 172], ['ro', 173], ['qa', 174],
+                ['li', 175], ['at', 176], ['sz', 177], ['hu', 178], ['ne', 179],
+                ['lu', 180], ['ad', 181], ['ci', 182], ['lr', 183], ['bn', 184],
+                ['be', 185], ['iq', 186], ['ge', 187], ['gm', 188], ['td', 189],
+                ['kv', 190], ['lb', 191], ['dj', 192], ['bi', 193], ['sr', 194],
+                ['il', 195], ['ml', 196], ['sn', 197], ['gn', 198], ['zw', 199],
+                ['pl', 200], ['mk', 201], ['py', 202], ['by', 203], ['cz', 204],
+                ['bf', 205], ['na', 206], ['tn', 207], ['bt', 208], ['kg', 209],
+                ['md', 210], ['ss', 211], ['bw', 212], ['sb', 213], ['ve', 214],
+                ['nz', 215], ['cu', 216], ['au', 217], ['bs', 218], ['mg', 219],
+                ['is', 220], ['eg', 221], ['np', 222]
+            ];
+
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const response = await fetch('src/components/data.json');
+            if (!response.ok) {
+              throw new Error('Network response was not ok ' + response.statusText);
+            }
+            const data = await response.json();
+            setInitialDummyData(data);
+          } catch (error) {
+            console.error("Error fetching data:", error);
+          }
+        };
+      
+        fetchData();
+      }, []);
 
     const [state, setState] = React.useState({
         ageopen:false,
@@ -1130,19 +263,26 @@ const ControlAndDisplay: React.FC = () => {
         sexopen: false,
         sexvalue: "all",
         BMIopen: false,
-        BMIvalue: "",
+        BMIvalue: "Normal(18-24.9)",
         Ethnicityopen: false,
-        Ethnicityvalue: ""
+        Ethnicityvalue: "White British"
     });
     
    
  
 
     const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-    const [selectedMetric, setSelectedMetric] = useState('WBC');
+    const [selectedMetric, setSelectedMetric] = useState('RBC');
+    const [highlightedRBC, setHighlightedRBC] = useState(null); // 新增状态用于高亮显示的 RBC 状态
+    const [selectedDiagnosis, setSelectedDiagnosis] = useState(null);
     //const [sex] = useState('');
     // const [filteredData, setFilteredData] = useState(initialDummyData);
-    
+    const chartConfig = {}; // Chart 配置
+
+    const handleRowClick = (diagnosis) => {
+        setSelectedDiagnosis(diagnosis); // 更新选中的诊断方法
+        setHighlightedRBC(diagnosis); // 更新需要高亮显示的 RBC 状态
+    };
    
     const monthFormat = 'YYYY/MM';
     const [fromDate, setFromDate] = useState(moment("2024/01", monthFormat).toDate());
@@ -1150,7 +290,6 @@ const ControlAndDisplay: React.FC = () => {
 
     const filteredData = useMemo(() => {
         let filtered = initialDummyData;
-    
         // 日期筛选
         if (fromDate || toDate) {
             filtered = filtered.filter((d) => {
@@ -1175,7 +314,7 @@ const ControlAndDisplay: React.FC = () => {
         }
 
         // 年龄筛选
-        if (!state.agevalue) {
+        if (!state.agevalue||!state.sexvalue||!state.Ethnicityvalue||!state.BMIvalue) {
             return [];
         }
         const selectedAge = state.agevalue;
@@ -1190,18 +329,61 @@ const ControlAndDisplay: React.FC = () => {
                 }
                 return false;
             });
-        
+
+            // BMI筛选
+        if (state.BMIvalue) {
+        const selectedBMI = state.BMIvalue;
+        filtered = filtered.filter((data) => {
+                const BMI = data.BMI;
+                if (selectedBMI === "Underweight(<18)" && BMI < 18) {
+                    return true;
+                } else if (selectedBMI === "Normal(18-24.9)" && BMI >= 18 && BMI < 25) {
+                    return true;  
+                } 
+                else if (selectedBMI === "Overweight(25-29.9)" && BMI >= 25 && BMI < 30) {
+                    return true;
+                    
+                }else if (selectedBMI === "Obesity(>30)" && BMI >= 30) {
+                    return true;
+                }
+                return false;
+            });
+           } 
     
         // 性别筛选
         if (state.sexvalue) {
             const selectedSex = state.sexvalue;
             filtered = filtered.filter((data) => data.sex === selectedSex);
         }
-    
+
+        // 人种筛选
+        if (state.Ethnicityvalue) {
+            const selectedEthnicity = state.Ethnicityvalue;
+            filtered = filtered.filter((data) => data.Ethnicity === selectedEthnicity);
+        }
+        
+        
         return filtered;
-    }, [fromDate, toDate, initialDummyData, state.agevalue, state.sexvalue]);
+    }, [fromDate, toDate, initialDummyData, state.agevalue, state.sexvalue,state.BMIvalue,state.Ethnicityvalue]);
     
-    
+            // 计算 RBC 数据的总和并更新 diagnosis
+        const updatedDiagnosis = diagnosis.map((diag) => {
+            const rbcCount = filteredData.reduce((acc, data) => {
+                // 根据诊断类型匹配对应的 RBC 数据
+                if (diag.diagnosis === "Normal") return acc + data.NormalRBC;
+                if (diag.diagnosis === "MildAnemia") return acc + data.MildAnemiaRBC;
+                if (diag.diagnosis === "ModerateAnemia") return acc + data.ModerateAnemiaRBC;
+                if (diag.diagnosis === "SevereAnemia") return acc + data.SevereAnemiaRBC;
+                if (diag.diagnosis === "Polycythemia") return acc + data.PolycythemiaRBC;
+                return acc;
+            }, 0);
+
+            return {
+                ...diag,
+                count: rbcCount // 将计算出的 RBC 总和赋值到 count
+            };
+        });
+
     const SelectPopover = ({ open, onOpenChange, value, onSelect, options, placeholder, noOptionsText }) => (
         <Popover open={open} onOpenChange={onOpenChange}>
             <PopoverTrigger asChild>
@@ -1360,8 +542,6 @@ const ControlAndDisplay: React.FC = () => {
                                     placeholderText="Pick an end month"
                                 />
                             </div>
-                   
-                            
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
                 Chips:<u></u>
@@ -1373,11 +553,11 @@ const ControlAndDisplay: React.FC = () => {
                                 () => setState((prev) => ({ ...prev, agevalue: "" }))
                             )}
 
-                            {state.sexvalue && state.sexvalue !== "all" &&
+                            {state.sexvalue && 
                             renderBadge(
                                 "Sex",
                                 sexs.find((sex) => sex.value === state.sexvalue)?.label,
-                                () => setState((prev) => ({ ...prev, sexvalue: "all" }))
+                                () => setState((prev) => ({ ...prev, sexvalue: "" }))
                             )}
 
                             {state.BMIvalue &&
@@ -1413,158 +593,266 @@ const ControlAndDisplay: React.FC = () => {
 
             {/* Bottom Section */}
            
-            <Card >
-                <CardHeader>
-                    <CardTitle >Trends</CardTitle>
-                    <CardDescription ></CardDescription>
-
-                </CardHeader>
-                <CardContent className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
-                    {/* Left Side: Top 5 Diagnosis Methods */}
-                    <Card className="w-[500px] h-[auto]">
-                        <CardHeader>
-                            <CardTitle>Top 5 Diagnosis Methods</CardTitle>
-                            <CardDescription>Card Description</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                                <Table className="w-full">
-                                    <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="font-semibold text-left pl-4">Diagnosis</TableHead>
-                                        <TableHead className="font-semibold text-right pr-4">Count</TableHead>
-                                        {/* 表头部分，定义了 "Diagnosis"（诊断名称）和 "Count"（计数）两列，分别显示诊断方法及其对应的计数。 */}
-                                    </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                    {diagnosis.map((diagnosi) => (
-                                        //通过 diagnosis.map() 遍历诊断数据，并为每个诊断生成一行数据。
-                                        <TableRow key={diagnosi.diagnosis} className="hover:bg-gray-50">
-                                        <TableCell className="flex items-center space-x-2 pl-4 py-4"> 
-                                            <Badge  
-                                            style={{       
-                                                backgroundColor: getBadgeColor(diagnosi.diagnosis), 
-                                            }}
-                                            />
-                                            <span className="font-medium">{diagnosi.diagnosis}</span>
-                                            <AlertDialog>
-                                                <AlertDialogTrigger>...</AlertDialogTrigger>
-                                                {/* 对话框的触发器，这里用 ... 作为触发元素，点击后会弹出对话框。 */}
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                    <AlertDialogTitle> This is {diagnosi.diagnosis}'s diagnosis.</AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        This is {diagnosi.diagnosis}'s diagnosis.
-                                                    </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
+            <Card>
+            <CardHeader>
+                <CardTitle>Trends</CardTitle>
+                <CardDescription></CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+                {/* Left Side: Top 5 Diagnosis Methods */}
+                <Card className="w-[500px] h-[auto]">
+                    <CardHeader>
+                        <CardTitle>Top 5 Diagnosis Methods</CardTitle>
+                        <CardDescription>Card Description</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Table className="w-full">
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="font-semibold text-left pl-4">Diagnosis</TableHead>
+                                    <TableHead className="font-semibold text-right pr-4">Count</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {updatedDiagnosis
+                                    .sort((a, b) => b.count - a.count) // 按 count 降序排序
+                                    .map((diagnosi) => (
+                                        <TableRow 
+                                            key={diagnosi.diagnosis} 
+                                            className={`hover:bg-gray-50 ${selectedDiagnosis === diagnosi.diagnosis ? 'bg-blue-100' : ''}`} 
+                                            onClick={() => handleRowClick(diagnosi.diagnosis)} // 点击行时更新选中的诊断
+                                        >
+                                            <TableCell className="flex items-center space-x-2 pl-4 py-4"> 
+                                                <Badge  
+                                                    style={{ backgroundColor: getBadgeColor(diagnosi.diagnosis) }}
+                                                />
+                                                <span className="font-medium">{diagnosi.diagnosis}</span>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger>...</AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>This is {diagnosi.diagnosis}'s diagnosis.</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                This is {diagnosi.diagnosis}'s diagnosis.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
                                                 </AlertDialog>
-                                        </TableCell>
-                                        <TableCell className="text-right pr-4 py-4 font-medium"> 
-                                            {diagnosi.count}
-                                        </TableCell>
+                                            </TableCell>
+                                            <TableCell className="text-right pr-4 py-4 font-medium"> 
+                                                {Math.floor(diagnosi.count)} {/* 将 count 转为整数 */}
+                                            </TableCell>
                                         </TableRow>
                                     ))}
-                                    </TableBody>
-                                </Table>
-                            </CardContent>
-                    </Card>
-                    
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
 
-                    {/*  Chart */}
-                    <Card className="chart-card">
-                        <CardHeader className="card-header">
-                            <CardTitle className="card-title">Chart</CardTitle>
-                            <CardDescription className="card-description">This is chart</CardDescription>
-                        </CardHeader>
-                        <CardContent className="p-4 bg-white rounded-b-lg" >
-                                <RadioGroup  
-                                //用于提供指标的选择，用户可以选择 WBC（白细胞）、HGB（血红蛋白）、或 RBC（红细胞计数）。
-                                className="flex space-x-2"
-                                aria-label="metric"
-                                name="metric"
-                                value={selectedMetric} //当前选中的指标值，如 "WBC"、"HGB" 或 "RBC"。
-                                onValueChange={handleMetricChange} //当用户选择不同的指标时，调用 handleMetricChange 函数更新 selectedMetric 的值。
-                                > 
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="WBC" id="option-one" />
-                                    <Label htmlFor="WBC">WBC</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="HGB" id="option-two" />
-                                    <Label htmlFor="HGB">HGB</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="RBC" id="option-three" />
-                                    <Label htmlFor="RBC">RBC</Label>
-                                </div>
-                                </RadioGroup>
-                            <ChartContainer config={chartConfig} className="chart-container">
-                                {/** Chart Component */}
-                                <ComposedChart
-                                    data={filteredData} //传入的数据源 filteredData，用于绘制图表。
-                                    margin={{
-                                        top: 10,
-                                        right: 30,
-                                        left: 30,
-                                        bottom: 0,
-                                    }}
-                                    >
+                {/* Chart */}
+                <Card className="border border-gray-300 rounded-lg shadow-md w-3/4 h-[auto]">
+                    <CardHeader className="bg-white p-4 rounded-t-lg shadow-sm">
+                        <CardTitle className="text-xl font-semibold text-gray-700">Chart</CardTitle>
+                        <CardDescription className="text-sm text-gray-500">This is chart</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-4 bg-white rounded-b-lg">
+                        <div>
+                            <Formik
+                                initialValues={{ metric: selectedMetric }}
+                                onSubmit={async (values) => {
+                                    await new Promise((r) => setTimeout(r, 500));
+                                    alert(JSON.stringify(values, null, 2));
+                                    setSelectedMetric(values.metric); // 更新选中的度量
+                                }}
+                            >
+                                {({ values }) => (
+                                    <Form>
+                                        <div role="group" aria-labelledby="my-radio-group" className="flex space-x-2">
+                                            <div className="flex items-center space-x-2">
+                                                <Field type="radio" name="metric" value="WBC" id="option-one" />
+                                                <label htmlFor="option-one">WBC</label>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <Field type="radio" name="metric" value="HGB" id="option-two" />
+                                                <label htmlFor="option-two">HGB</label>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <Field type="radio" name="metric" value="RBC" id="option-three" />
+                                                <label htmlFor="option-three">RBC</label>
+                                            </div>
+                                            <button type="submit" className="px-2 py-1 border-2 border-black bg-white text-black text-base rounded transition-colors duration-300 hover:bg-black hover:text-white active:bg-gray-500 active:border-gray-600">Submit</button>
+                                        </div>
+                                    </Form>
+                                )}
+                            </Formik>
+
+                            {/* Display the selected metric after form submission */}
+                            <div className="mt-4">
+                                <strong>Currently Selected Metric:</strong> {selectedMetric}
+                            </div>
+                        </div>
+                        <ChartContainer config={chartConfig} className="h-96 w-full bg-gray-100 rounded-lg shadow-md">
+                            <ComposedChart data={filteredData} margin={{ top: 10, right: 30, left: 30, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" />
-                                {/* 绘制图表的网格线，strokeDasharray="3 3" 表示网格线为虚线。 */}
-                                <XAxis 
-                                    dataKey="time"
-                                    tickFormatter={(time, index) => {
-                                        // 检查当前日期是否和前一个日期重复，若重复，则不显示
-                                        if (index === 0 || time !== filteredData[index - 1].time) {
-                                            return time; // 显示日期
-                                        }
-                                        return ""; // 重复时不显示刻度
-                                    }}
-                                />
-                                {/* 设置 X 轴，dataKey="time" 表示 X 轴的数据来自数据源中的 time 字段。 */}
-                                <YAxis label={{ value: selectedMetric, angle: -90, position: 'insideLeft', textAnchor: 'middle' }} domain={['auto', 'auto']}/>
-                                {/* 设置 Y 轴，label 属性用于设置 Y 轴的标签，selectedMetric 动态指定标签内容。domain={['auto', 'auto']} 使 Y 轴的范围自动调整。 */}
-                                <Tooltip  />
-                                <Legend  />
-                                    {selectedMetric === "WBC" && (
-                                        <>
-                                        {/* 如果 selectedMetric 为 "WBC"，则绘制表示男性和女性白细胞计数的数据。
-                                        Area 元素绘制填充区域，Line 元素绘制线条，分别用不同颜色表示不同的数据。 */}
-                                        <Area  dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
-                                        <Line  dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
-                                        <Area  dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#FF6A6A"/>
-                                        <Line  dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
-                                      </>
-                                    )}
-                                     {selectedMetric === "HGB" && (
-                                        <>
-                                        {/* 如果 selectedMetric 为 "HGB"，图表内容与 WBC 类似，但显示的是血红蛋白数据。 */}
-                                        <Bar  dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
-                                        <Line  dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
-                                        <Bar  dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#FF6A6A"/>
-                                        <Line  dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
-                                        </>
-                                    )}
-                                    {selectedMetric === "RBC" && (
-                                        <>
-                                        {/* 如果 selectedMetric 为 "RBC"，图表显示多条线条，分别表示正常和不同程度贫血等情况。 */}
-                                        <Bar  dataKey={`Normal${selectedMetric}`} fill="#228B22" />
-                                        <Bar  dataKey={`MildAnemia${selectedMetric}`} fill="#EEEE00" />
-                                        <Bar  dataKey={`ModerateAnemia${selectedMetric}`} fill="#EE7942" />
-                                        <Bar  dataKey={`SevereAnemia${selectedMetric}`} fill="#FF0000" />
-                                        <Bar  dataKey={`Polycythemia${selectedMetric}`} fill="#8A2BE2" />
-                                        </>
-                                    )}
-                                    </ComposedChart>
-                            </ChartContainer>
-                        </CardContent>
-                    </Card>
-                </CardContent>
-            </Card>
+                                <XAxis dataKey="time" />
+                                <YAxis label={{ value: selectedMetric, angle: -90, position: 'insideLeft', textAnchor: 'middle' }} domain={['auto', 'auto']} />
+                                <Tooltip />
+                                <Legend />
+                                {selectedMetric === "WBC" && (
+                                    <>
+                                        <Area dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
+                                        <Line dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
+                                        <Area dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#FF6A6A"/>
+                                        <Line dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
+                                    </>
+                                )}
+                                {selectedMetric === "HGB" && (
+                                    <>
+                                        <Bar dataKey={`UL95CI_Male${selectedMetric}`} stroke="#8884d8" fill="#FFC125"/>
+                                        <Line dataKey={`Male${selectedMetric}`} stroke="#CD5555" />
+                                        <Bar dataKey={`UL95CI_Female${selectedMetric}`} stroke="#8884d8" fill="#FF6A6A"/>
+                                        <Line dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
+                                    </>
+                                )}
+                               {selectedMetric === "RBC" && (
+                                <>
+                                    <Bar 
+                                        dataKey={`Normal${selectedMetric}`} 
+                                        fill={highlightedRBC === 'Normal' ? "#FFB6C1" : "#228B22"} 
+                                        strokeWidth={highlightedRBC === 'Normal' ? 4 : 2} 
+                                        stroke={highlightedRBC === 'Normal' ? "#FF69B4" : "none"} // 突出颜色
+                                    />
+                                    <Bar 
+                                        dataKey={`MildAnemia${selectedMetric}`} 
+                                        fill={highlightedRBC === 'MildAnemia' ? "#FFB6C1" : "#EEEE00"} 
+                                        strokeWidth={highlightedRBC === 'MildAnemia' ? 4 : 2} 
+                                        stroke={highlightedRBC === 'MildAnemia' ? "#FF69B4" : "none"} // 突出颜色
+                                    />
+                                    <Bar 
+                                        dataKey={`ModerateAnemia${selectedMetric}`} 
+                                        fill={highlightedRBC === 'ModerateAnemia' ? "#FFB6C1" : "#EE7942"} 
+                                        strokeWidth={highlightedRBC === 'ModerateAnemia' ? 4 : 2} 
+                                        stroke={highlightedRBC === 'ModerateAnemia' ? "#FF69B4" : "none"} // 突出颜色
+                                    />
+                                    <Bar 
+                                        dataKey={`SevereAnemia${selectedMetric}`} 
+                                        fill={highlightedRBC === 'SevereAnemia' ? "#FFB6C1" : "#FF0000"} 
+                                        strokeWidth={highlightedRBC === 'SevereAnemia' ? 4 : 2} 
+                                        stroke={highlightedRBC === 'SevereAnemia' ? "#FF69B4" : "none"} // 突出颜色
+                                    />
+                                    <Bar 
+                                        dataKey={`Polycythemia${selectedMetric}`} 
+                                        fill={highlightedRBC === 'Polycythemia' ? "#FFB6C1" : "#8A2BE2"} 
+                                        strokeWidth={highlightedRBC === 'Polycythemia' ? 4 : 2} 
+                                        stroke={highlightedRBC === 'Polycythemia' ? "#FF69B4" : "none"} // 突出颜色
+                                    />
+                                </>
+                            )}
 
+   
+                            </ComposedChart>
+                        </ChartContainer>
+                    </CardContent>
+                </Card>
+            </CardContent>
+        </Card>
+
+            <Card>
+            <CardHeader>
+                <CardTitle>Card Title</CardTitle>
+                <CardDescription>Card Description</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+                <Card className="border border-gray-300 rounded-lg shadow-md w-3/4 h-[auto]">
+                    <CardHeader>
+                        <CardTitle>Card Title</CardTitle>
+                        <CardDescription>Card Description</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div style={{ width: '100%', height: '500px' }}>
+                            <HighchartsReact
+                                highcharts={Highcharts}
+                                constructorType={'mapChart'}
+                                options={{
+                                    chart: {
+                                        map: topology,
+                                        backgroundColor: '#f5f5f5',
+                                    },
+                                    title: {
+                                        text: 'Highcharts Maps Basic Demo',
+                                    },
+                                    subtitle: {
+                                        text: 'Source map: Local GeoJSON data',
+                                    },
+                                    mapNavigation: {
+                                        enabled: true,
+                                        buttonOptions: {
+                                            verticalAlign: 'bottom',
+                                        },
+                                    },
+                                    colorAxis: {
+                                        min: 0,
+                                        stops: [
+                                            [0, '#EFEFFF'],
+                                            [0.5, '#005B96'],
+                                            [1, '#003c68']
+                                        ],
+                                    },
+                                    series: [{
+                                        data: data,
+                                        name: 'Random data',
+                                        states: {
+                                            hover: {
+                                                color: '#BADA55',
+                                            },
+                                        },
+                                        dataLabels: {
+                                            enabled: true,
+                                            format: '{point.name}',
+                                        },
+                                    }],
+                                }}
+                            />
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card className="w-1/4 h-[auto]">
+                    <CardHeader>
+                        <CardTitle>Top 10 Countries</CardTitle>
+                        <CardDescription>Card Description</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Table className="w-full">
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="font-semibold text-left pl-4">Country Code</TableHead>
+                                    <TableHead className="font-semibold text-right pr-4">Count</TableHead>
+                                    {/* 表头部分，定义了 "Country Code"（国家代码）和 "Count"（计数）两列 */}
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {data
+                                    .sort((a, b) => b[1] - a[1]) // 按 count 降序排序
+                                    .slice(0, 10) // 只取前 10 个国家
+                                    .map(([countryCode, count]) => (
+                                        <TableRow key={countryCode} className="hover:bg-gray-50">
+                                            <TableCell className="flex items-center space-x-2 pl-4 py-4"> 
+                                                <span className="font-medium">{countryCode.toUpperCase()}</span> {/* 显示国家代码 */}
+                                            </TableCell>
+                                            <TableCell className="text-right pr-4 py-4 font-medium"> 
+                                                {count} {/* 显示计数 */}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </CardContent>
+            </Card>
         </Box>
     );
 };
