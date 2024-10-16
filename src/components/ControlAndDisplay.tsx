@@ -1,5 +1,8 @@
 
-import React, { useState,useMemo,useEffect  } from 'react';
+import React, { useState,useMemo,useEffect,useRef  } from 'react';
+import 'timezone-js'; 
+import moment from 'moment-timezone';
+import { DateTime } from 'luxon';
 import { Box, Grid, TextField,  Chip, FormControl, InputLabel, Select, MenuItem,  Typography } from '@mui/material';
 import TuneIcon from '@mui/icons-material/Tune';
 import NewspaperIcon from '@mui/icons-material/Newspaper';
@@ -16,8 +19,6 @@ import { addDays, format, isWithinInterval } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-
-import moment from 'moment';
 import ReactDOM from 'react-dom';
 import { Formik, Field, Form } from 'formik';
 import { Calendar } from "@/components/ui/calendar"
@@ -66,8 +67,8 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 // Initialize the map module
 import topology from './world.json'; // Import your local GeoJSON data
-import map from 'highcharts/modules/map'; // 导入地图模块
-map(Highcharts); // 注册地图模块
+import HighchartsMap from 'highcharts/modules/map'; // 导入地图模块
+HighchartsMap(Highcharts);
 
 const Ages = [
     {
@@ -179,7 +180,7 @@ const sexs = [
       case 'Normal':
         return '#228B22'; 
       case 'MildAnemia':
-        return '#EEEE00'; 
+        return '#3A5FCD'; 
       case 'ModerateAnemia':
         return '#EE7942'; 
       case 'SevereAnemia':
@@ -239,6 +240,8 @@ const ControlAndDisplay: React.FC = () => {
                 ['nz', 215], ['cu', 216], ['au', 217], ['bs', 218], ['mg', 219],
                 ['is', 220], ['eg', 221], ['np', 222]
             ];
+           
+    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -460,6 +463,236 @@ const ControlAndDisplay: React.FC = () => {
     //     setSex(event.target.value as string);
     // };
     
+    const inputRef = useRef(null);
+    const chartRef = useRef(null);
+
+    // Country timezone mapping
+        const timezoneMapping = {
+            'JP': 'Asia/Tokyo',               // Japan
+            'US': 'America/New_York',         // United States (Eastern)
+            'FR': 'Europe/Paris',             // France
+            'DE': 'Europe/Berlin',            // Germany
+            'CN': 'Asia/Shanghai',            // China
+            'IN': 'Asia/Kolkata',             // India
+            'BR': 'America/Sao_Paulo',       // Brazil
+            'AU': 'Australia/Sydney',         // Australia
+            'CA': 'America/Toronto',          // Canada
+            'MX': 'America/Mexico_City',     // Mexico
+            'RU': 'Europe/Moscow',            // Russia
+            'ZA': 'Africa/Johannesburg',      // South Africa
+            'IT': 'Europe/Rome',              // Italy
+            'ES': 'Europe/Madrid',            // Spain
+            'NL': 'Europe/Amsterdam',         // Netherlands
+            'SE': 'Europe/Stockholm',         // Sweden
+            'NO': 'Europe/Oslo',              // Norway
+            'FI': 'Europe/Helsinki',          // Finland
+            'PL': 'Europe/Warsaw',            // Poland
+            'DK': 'Europe/Copenhagen',        // Denmark
+            'IE': 'Europe/Dublin',            // Ireland
+            'PT': 'Europe/Lisbon',            // Portugal
+            'TR': 'Europe/Istanbul',          // Turkey
+            'JP': 'Asia/Tokyo',               // Japan
+            'KR': 'Asia/Seoul',               // South Korea
+            'SG': 'Asia/Singapore',            // Singapore
+            'MY': 'Asia/Kuala_Lumpur',        // Malaysia
+            'TH': 'Asia/Bangkok',             // Thailand
+            'VN': 'Asia/Ho_Chi_Minh',         // Vietnam
+            'PH': 'Asia/Manila',              // Philippines
+            'AR': 'America/Argentina/Buenos_Aires', // Argentina
+            'CL': 'America/Santiago',         // Chile
+            'CO': 'America/Bogota',           // Colombia
+            'PE': 'America/Lima',             // Peru
+            'VE': 'America/Caracas',          // Venezuela
+            'AE': 'Asia/Dubai',               // United Arab Emirates
+            'IL': 'Asia/Jerusalem',           // Israel
+            'EG': 'Africa/Cairo',             // Egypt
+            'NG': 'Africa/Lagos',             // Nigeria
+            'KE': 'Africa/Nairobi',           // Kenya
+            'GH': 'Africa/Accra',             // Ghana
+            'UG': 'Africa/Kampala',           // Uganda
+            'TZ': 'Africa/Dar_es_Salaam',    // Tanzania
+            'DZ': 'Africa/Algiers',           // Algeria
+            'MA': 'Africa/Casablanca',        // Morocco
+        };
+
+        const handleCountryClick = (countryCode) => {
+            const chart = chartRef.current.chart;
+            if (!chart) return;
+    
+            // 使用 chart.series[0].data 找到对应的点
+            const matchingPoint = chart.series[0].data.find(point => point.properties['hc-a2'] === countryCode);
+    
+            // 重置所有点的状态
+            chart.series[0].data.forEach(point => {
+                point.setState('');
+            });
+    
+            if (matchingPoint) {
+                // 确定匹配国家是白天还是夜晚
+                const isDay = isDayTime(countryCode);
+                const highlightColor = isDay ? '#FFD700' : '#2E3A87'; // 白天高亮颜色和夜晚高亮颜色
+    
+                // 设置匹配的点为悬停状态，并使用相应的颜色
+                matchingPoint.setState('hover');
+                matchingPoint.graphic.attr({ fill: highlightColor }); // 直接设置填充颜色
+    
+                // 1秒后恢复原来的颜色
+                setTimeout(() => {
+                    const originalColor = '#0076B8'; // 假设原始颜色为此
+                    matchingPoint.graphic.attr({ fill: originalColor });
+                }, 1000);
+            } else {
+                console.log('No matching country found for input:', countryCode);
+            }
+        };
+    
+        const data1 = [
+            { name: 'China', code: 'CN' },
+            { name: 'Japan', code: 'JP' },
+            { name: 'Canada', code: 'CA' },
+        ];
+        
+            // Function to get local time based on country code
+            const getLocalTime = (countryCode) => {
+                const timezone = timezoneMapping[countryCode];
+                if (timezone) {
+                    const localTime = DateTime.now().setZone(timezone);
+                    return localTime.hour; // Returns hours in 24-hour format
+                }
+                return null; // Return null if timezone is not found
+            };
+            
+            // Function to determine if it's daytime or nighttime based on country code
+            const isDayTime = (countryCode) => {
+                const hours = getLocalTime(countryCode); // Get the current hour in the country's timezone
+                console.log(`Country Code: ${countryCode}, Local Hours: ${hours}`); // Debug log
+                return hours !== null && hours >= 6 && hours < 18; // Daytime is defined from 6 AM to 6 PM
+            };
+            
+            // Handle submit event and update the map based on local time
+            const handleSubmit = () => {
+                const value = inputRef.current.value.trim().toLowerCase(); // Get input value and process it
+                console.log('Submitted Value:', value);
+            
+                const chart = chartRef.current.chart;
+                if (!chart) return;
+            
+                // Find the matching data point
+                const matchingPoint = chart.series[0].data.find(point => {
+                    return point.name && point.name.toLowerCase().includes(value);
+                });
+            
+                // Reset all points' states
+                chart.series[0].data.forEach(point => {
+                    point.setState('');
+                });
+            
+                if (matchingPoint) {
+                    console.log('Matched Country:', matchingPoint.name);
+                    
+                    // Get the country's code from properties
+                    const countryCode = matchingPoint.properties['hc-a2']; // Use 'hc-a2' for country code
+            
+                    // Determine if it's day or night for the matched country
+                    const isDay = isDayTime(countryCode); // Check if it is day or night
+            
+                    console.log(`Is Day: ${isDay}`); // Debug log
+                    const highlightColor = isDay ? '#FFD700' : '#2E3A87'; // Light green for day, dark green for night
+            
+                    // Set the matched point to hover state with the appropriate color
+                    matchingPoint.setState('hover');
+                    matchingPoint.graphic.attr({ fill: highlightColor }); // Set fill color directly
+                    
+                } else {
+                    console.log('No matching country found for input:', value);
+                }
+            };
+
+            const mapOptions = {
+                chart: {
+                    map: topology,
+                    backgroundColor: '#f5f5f5',
+                },
+                title: {
+                    text: 'Highcharts Maps Basic Demo',
+                },
+                subtitle: {
+                    text: 'Source map: Local GeoJSON data',
+                },
+                mapNavigation: {
+                    enabled: true,
+                    buttonOptions: {
+                        verticalAlign: 'bottom',
+                    },
+                },
+                colorAxis: {
+                    min: 0,
+                    stops: [
+                        [0, '#0076B8'],
+                        
+                    ],
+
+                },
+                tooltip: {
+                    useHTML: true,
+                    formatter: function () {
+                        const countryName = this.point.name;
+                        const value = this.point.value;
+                        const countryCode = this.point.properties['hc-a2'];
+                        const isDay = isDayTime(countryCode);
+                        const timeStatus = isDay ? 'Day' : 'Night';
+                        return `<b>${countryName}</b>: ${value}<br>Status: ${timeStatus}`;
+                    },
+                },
+                series: [
+                    {
+                        data: data,
+                        states: {
+                            hover: {
+                                enabled: false, // 禁用悬停效果
+                            },
+                        },
+                        point: {
+                            events: {
+                                // 点击事件
+                                click: function () {
+                                    const point = this; // 当前点击的点
+                                    const countryCode = point.properties['hc-a2'];
+                                    const isDay = isDayTime(countryCode);
+                                    let highlightColor;
+                                    
+                                    // 根据白天或夜晚状态设置颜色
+                                    if (isDay) {
+                                        highlightColor = '#FFD700'; // 白天高亮颜色
+                                    } else {
+                                        highlightColor = '#2E3A87'; // 夜晚高亮颜色
+                                    }
+                                    
+                                    // 设置填充颜色
+                                    if (point.graphic) {
+                                        point.graphic.attr({ fill: highlightColor });
+                                    }
+                                    
+                                    
+                                    // 1秒后恢复原来的颜色
+                                    setTimeout(() => {
+                                        const originalColor = '#0076B8'; // 假设原始颜色为此，或根据需要调整
+                                        point.graphic.attr({ fill: originalColor });
+                                    }, 1000);
+                                },
+                            },
+                        },
+                    },
+                ],
+            };
+            
+            
+            
+            
+            
+            
+
+
     return (
         <Box sx={{ padding: 2}}>
 
@@ -717,42 +950,36 @@ const ControlAndDisplay: React.FC = () => {
                                         <Line dataKey={`Female${selectedMetric}`} stroke="#1874CD" />
                                     </>
                                 )}
-                               {selectedMetric === "RBC" && (
+                              {selectedMetric === "RBC" && (
                                 <>
                                     <Bar 
                                         dataKey={`Normal${selectedMetric}`} 
-                                        fill={highlightedRBC === 'Normal' ? "#FFB6C1" : "#228B22"} 
-                                        strokeWidth={highlightedRBC === 'Normal' ? 4 : 2} 
-                                        stroke={highlightedRBC === 'Normal' ? "#FF69B4" : "none"} // 突出颜色
+                                        fill="#228B22"  
+                                        style={highlightedRBC ? (highlightedRBC === 'Normal' ? { opacity: 1 } : { opacity: 0.2 }) : { opacity: 1 }} // Dim only when highlighted
                                     />
                                     <Bar 
                                         dataKey={`MildAnemia${selectedMetric}`} 
-                                        fill={highlightedRBC === 'MildAnemia' ? "#FFB6C1" : "#EEEE00"} 
-                                        strokeWidth={highlightedRBC === 'MildAnemia' ? 4 : 2} 
-                                        stroke={highlightedRBC === 'MildAnemia' ? "#FF69B4" : "none"} // 突出颜色
+                                        fill="#3A5FCD"  
+                                        style={highlightedRBC ? (highlightedRBC === 'MildAnemia' ? { opacity: 1 } : { opacity: 0.2 }) : { opacity: 1 }} // Dim only when highlighted
                                     />
                                     <Bar 
                                         dataKey={`ModerateAnemia${selectedMetric}`} 
-                                        fill={highlightedRBC === 'ModerateAnemia' ? "#FFB6C1" : "#EE7942"} 
-                                        strokeWidth={highlightedRBC === 'ModerateAnemia' ? 4 : 2} 
-                                        stroke={highlightedRBC === 'ModerateAnemia' ? "#FF69B4" : "none"} // 突出颜色
+                                        fill="#FF7F24"  
+                                        style={highlightedRBC ? (highlightedRBC === 'ModerateAnemia' ? { opacity: 1 } : { opacity: 0.2 }) : { opacity: 1 }} // Dim only when highlighted
                                     />
                                     <Bar 
                                         dataKey={`SevereAnemia${selectedMetric}`} 
-                                        fill={highlightedRBC === 'SevereAnemia' ? "#FFB6C1" : "#FF0000"} 
-                                        strokeWidth={highlightedRBC === 'SevereAnemia' ? 4 : 2} 
-                                        stroke={highlightedRBC === 'SevereAnemia' ? "#FF69B4" : "none"} // 突出颜色
+                                        fill="#FF0000"  
+                                        style={highlightedRBC ? (highlightedRBC === 'SevereAnemia' ? { opacity: 1 } : { opacity: 0.2 }) : { opacity: 1 }} // Dim only when highlighted
                                     />
                                     <Bar 
                                         dataKey={`Polycythemia${selectedMetric}`} 
-                                        fill={highlightedRBC === 'Polycythemia' ? "#FFB6C1" : "#8A2BE2"} 
-                                        strokeWidth={highlightedRBC === 'Polycythemia' ? 4 : 2} 
-                                        stroke={highlightedRBC === 'Polycythemia' ? "#FF69B4" : "none"} // 突出颜色
+                                        fill="#8A2BE2"  
+                                        style={highlightedRBC ? (highlightedRBC === 'Polycythemia' ? { opacity: 1 } : { opacity: 0.2 }) : { opacity: 1 }} // Dim only when highlighted
                                     />
                                 </>
                             )}
 
-   
                             </ComposedChart>
                         </ChartContainer>
                     </CardContent>
@@ -772,84 +999,58 @@ const ControlAndDisplay: React.FC = () => {
                         <CardDescription>Card Description</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div style={{ width: '100%', height: '500px' }}>
-                            <HighchartsReact
-                                highcharts={Highcharts}
-                                constructorType={'mapChart'}
-                                options={{
-                                    chart: {
-                                        map: topology,
-                                        backgroundColor: '#f5f5f5',
-                                    },
-                                    title: {
-                                        text: 'Highcharts Maps Basic Demo',
-                                    },
-                                    subtitle: {
-                                        text: 'Source map: Local GeoJSON data',
-                                    },
-                                    mapNavigation: {
-                                        enabled: true,
-                                        buttonOptions: {
-                                            verticalAlign: 'bottom',
-                                        },
-                                    },
-                                    colorAxis: {
-                                        min: 0,
-                                        stops: [
-                                            [0, '#EFEFFF'],
-                                            [0.5, '#005B96'],
-                                            [1, '#003c68']
-                                        ],
-                                    },
-                                    series: [{
-                                        data: data,
-                                        name: 'Random data',
-                                        states: {
-                                            hover: {
-                                                color: '#BADA55',
-                                            },
-                                        },
-                                        dataLabels: {
-                                            enabled: true,
-                                            format: '{point.name}',
-                                        },
-                                    }],
-                                }}
-                            />
-                        </div>
+
+                    
+                    <div style={{ width: '100%', height: '500px' }}>
+                        <HighchartsReact
+                            ref={chartRef}
+                            highcharts={Highcharts}
+                            constructorType={'mapChart'}
+                            options={mapOptions}
+                        />
+                    </div>
+                
                     </CardContent>
                 </Card>
                 <Card className="w-1/4 h-[auto]">
                     <CardHeader>
-                        <CardTitle>Top 10 Countries</CardTitle>
+                        <CardTitle>Top 5 Countries</CardTitle>
                         <CardDescription>Card Description</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <Table className="w-full">
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="font-semibold text-left pl-4">Country Code</TableHead>
-                                    <TableHead className="font-semibold text-right pr-4">Count</TableHead>
-                                    {/* 表头部分，定义了 "Country Code"（国家代码）和 "Count"（计数）两列 */}
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {data
-                                    .sort((a, b) => b[1] - a[1]) // 按 count 降序排序
-                                    .slice(0, 10) // 只取前 10 个国家
-                                    .map(([countryCode, count]) => (
-                                        <TableRow key={countryCode} className="hover:bg-gray-50">
-                                            <TableCell className="flex items-center space-x-2 pl-4 py-4"> 
-                                                <span className="font-medium">{countryCode.toUpperCase()}</span> {/* 显示国家代码 */}
-                                            </TableCell>
-                                            <TableCell className="text-right pr-4 py-4 font-medium"> 
-                                                {count} {/* 显示计数 */}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
+                        <CardContent>
+                        <input
+                        ref={inputRef}
+                        type="text"
+                        placeholder="搜索国家名称..."
+                        style={{ margin: '5px', padding: '5px', width: '150px' }}
+                    />
+                    <button onClick={handleSubmit} className="px-2 py-1 border-2 border-black bg-white text-black text-base rounded transition-colors duration-300 hover:bg-black hover:text-white active:bg-gray-500 active:border-gray-600">
+                        Submit
+                    </button>
+                    <Table style={{ margin: '20px 0', borderCollapse: 'collapse', width: '100%' }}>
+                    <TableCaption>A list of your recent invoices.</TableCaption>
+                    <TableHeader>
+                        <TableRow style={{ borderBottom: '1px solid #ccc' }}>
+                        <TableHead className="w-[100px]" style={{ padding: '10px' }}>Country</TableHead>
+                        <TableHead style={{ padding: '10px' }}>Local Time</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {data1.map(country => (
+                        <TableRow 
+                            key={country.code} 
+                            onClick={() => handleCountryClick(country.code)} 
+                            style={{ cursor: 'pointer', borderBottom: '1px solid #eee' }}
+                        >
+                            <TableCell style={{ padding: '10px' }}>{country.name}</TableCell>
+                            <TableCell style={{ padding: '10px' }}>{getLocalTime(country.code)}</TableCell>
+                        </TableRow>
+                        ))}
+                    </TableBody>
+                    </Table>
+                            
+
+                        </CardContent>
                 </Card>
             </CardContent>
             </Card>
